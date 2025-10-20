@@ -1,0 +1,295 @@
+{
+  "sheetName": "Sheet1",
+  "columns": [
+    "set",
+    "set",
+    "set",
+    "set",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "rows": [
+    {
+      "set": "/leasing-service/api/v1/search-leasing-owner",
+      "col_5": null,
+      "col_6": null,
+      "col_7": null,
+      "col_8": null
+    },
+    {
+      "set": "GET",
+      "col_5": null,
+      "col_6": null,
+      "col_7": null,
+      "col_8": null
+    },
+    {
+      "set": "VEH_LEASING_OWNER",
+      "col_5": null,
+      "col_6": null,
+      "col_7": null,
+      "col_8": null
+    },
+    {
+      "set": "Header",
+      "col_5": "Header",
+      "col_6": "Header",
+      "col_7": "Header",
+      "col_8": "Header"
+    },
+    {
+      "set": "ค่าที่เป็นไปได้",
+      "col_5": "รายละเอียด",
+      "col_6": "รูปแบบข้อมูล",
+      "col_7": "ตัวอย่างข้อมูล",
+      "col_8": "รหัสผิดพลาด"
+    },
+    {
+      "set": "-",
+      "col_5": "Basic Authentication",
+      "col_6": "Bearer+\" \"+ token (Token ที่ได้จากเส้น /api/auth)",
+      "col_7": null,
+      "col_8": "SGP_ERR_90000"
+    },
+    {
+      "set": "-",
+      "col_5": "รหัสอ้างอิงการเรียกใช้งานระบบ Transaction Id",
+      "col_6": "TyyyymmddHHMMsssss+Running Unique ID",
+      "col_7": "T20190130123001000001",
+      "col_8": "SGP_ERR_90001"
+    },
+    {
+      "set": "-",
+      "col_5": "วันที่และเวลาที่เรียกใช้งาน",
+      "col_6": "yyyy-mm-ddTHH:MM:ss.sss",
+      "col_7": "2019-01-30T11:09:35.001",
+      "col_8": "SGP_ERR_90002"
+    },
+    {
+      "set": "ต้องระบุค่า\n- WEB\n- MOBILE",
+      "col_5": "ระบบ จะเป็นผู้กำหนด source ให้กับ client เข้ามาเรียกใช้",
+      "col_6": "-",
+      "col_7": "WEB",
+      "col_8": "SGP_ERR_90003"
+    },
+    {
+      "set": "ต้องระบุค่า\n- TH\n- EN",
+      "col_5": "ภาษาที่เรียกใช้",
+      "col_6": "-",
+      "col_7": "TH",
+      "col_8": "SGP_ERR_90004"
+    },
+    {
+      "set": "M00000",
+      "col_5": "ระบบ",
+      "col_6": "-",
+      "col_7": "M00000",
+      "col_8": "SGP_ERR_90005"
+    },
+    {
+      "set": "Query String",
+      "col_5": "Query String",
+      "col_6": "Query String",
+      "col_7": "Query String",
+      "col_8": "Query String"
+    },
+    {
+      "set": "ค่าที่เป็นไปได้",
+      "col_5": "รายละเอียด",
+      "col_6": "รูปแบบข้อมูล",
+      "col_7": "ตัวอย่างข้อมูล",
+      "col_8": "รหัสผิดพลาด"
+    },
+    {
+      "set": "-",
+      "col_5": "เลขที่หน้าที่ต้องการข้อมูล",
+      "col_6": null,
+      "col_7": 2,
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "จำนวนข้อมูลที่แสดงต่อ 1 หน้า",
+      "col_6": null,
+      "col_7": 10,
+      "col_8": null
+    },
+    {
+      "set": null,
+      "col_5": "ชื่ื่อ",
+      "col_6": null,
+      "col_7": "นอส ดารามุด",
+      "col_8": null
+    },
+    {
+      "set": null,
+      "col_5": "เลขบัตรประชาชน",
+      "col_6": null,
+      "col_7": "1212312121",
+      "col_8": null
+    },
+    {
+      "set": null,
+      "col_5": "เบอร์โทร",
+      "col_6": null,
+      "col_7": "08xxxxxxxx",
+      "col_8": null
+    },
+    {
+      "set": "Rest Controller - Response",
+      "col_5": null,
+      "col_6": null,
+      "col_7": null,
+      "col_8": null
+    },
+    {
+      "set": "/leasing-service/api/v1/search-leasing-owner",
+      "col_5": null,
+      "col_6": null,
+      "col_7": null,
+      "col_8": null
+    },
+    {
+      "set": "GET",
+      "col_5": null,
+      "col_6": null,
+      "col_7": null,
+      "col_8": null
+    },
+    {
+      "set": "Header",
+      "col_5": "Header",
+      "col_6": "Header",
+      "col_7": "Header",
+      "col_8": null
+    },
+    {
+      "set": "ค่าที่เป็นไปได้",
+      "col_5": "รายละเอียด",
+      "col_6": "รูปแบบข้อมูล",
+      "col_7": "ตัวอย่างข้อมูล",
+      "col_8": null
+    },
+    {
+      "set": "ค่าเดิมที่ client request เข้ามาภายในระบบ",
+      "col_5": "รหัสอ้างอิงการเรียกใช้งานระบบ Transaction Id",
+      "col_6": "TyyyymmddHHMMsssss+Running Unique ID",
+      "col_7": "T20190130123001000001",
+      "col_8": null
+    },
+    {
+      "set": "ค่าเดิมที่ client request เข้ามาภายในระบบ",
+      "col_5": "วันที่และเวลาที่เรียกใช้งาน",
+      "col_6": "yyyy-mm-ddTHH:MM:ss.sss",
+      "col_7": "2019-01-30T11:09:35.001",
+      "col_8": null
+    },
+    {
+      "set": "วันที่และเวลาปัจจุบัน",
+      "col_5": "วันที่และเวลาที่ส่งข้อมูลกลับ",
+      "col_6": "yyyy-mm-ddTHH:MM:ss.sss",
+      "col_7": "2019-01-30T11:09:36.001",
+      "col_8": null
+    },
+    {
+      "set": "Body",
+      "col_5": "Body",
+      "col_6": "Body",
+      "col_7": "Body",
+      "col_8": null
+    },
+    {
+      "set": "ค่าที่เป็นไปได้",
+      "col_5": "รายละเอียด",
+      "col_6": "รูปแบบข้อมูล",
+      "col_7": "ตัวอย่างข้อมูล",
+      "col_8": null
+    },
+    {
+      "set": "ต้องระบุค่า\n- true\n- false",
+      "col_5": "สถานะการดำเนินการ",
+      "col_6": "-",
+      "col_7": true,
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "ข้อความสถานะการดำเนินการ",
+      "col_6": "-",
+      "col_7": "ดำเนินการไม่สำเร็จ",
+      "col_8": null
+    },
+    {
+      "set": "ในกรณีที่ระบบดำเนินการไม่สำเร็จ status = false",
+      "col_5": "ในกรณีที่ระบบดำเนินการไม่สำเร็จ status = false",
+      "col_6": "ในกรณีที่ระบบดำเนินการไม่สำเร็จ status = false",
+      "col_7": "ในกรณีที่ระบบดำเนินการไม่สำเร็จ status = false",
+      "col_8": null
+    },
+    {
+      "set": "ต้องระบุค่า\n",
+      "col_5": "รหัสผิดพลาด",
+      "col_6": "-",
+      "col_7": "MAS_ERR_00001",
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "Error รายละเอียด",
+      "col_6": "กรณี Language ใน request header\n เป็น TH จะ ใช้ค่า MESSAGE_NAME_TH\n เป็น EN จะ ใช้ค่า MESSAGE_NAME_EN",
+      "col_7": "กรุณาระบุข้อมูลให้ครบถ้วน",
+      "col_8": null
+    },
+    {
+      "set": "ในกรณีที่ระบบดำเนินการสำเร็จ",
+      "col_5": "ในกรณีที่ระบบดำเนินการสำเร็จ",
+      "col_6": "ในกรณีที่ระบบดำเนินการสำเร็จ",
+      "col_7": "ในกรณีที่ระบบดำเนินการสำเร็จ",
+      "col_8": null
+    },
+    {
+      "set": null,
+      "col_5": "รหัสบริษัทผู้เช่า",
+      "col_6": null,
+      "col_7": "R0000000000000001",
+      "col_8": null
+    },
+    {
+      "set": null,
+      "col_5": "ชื่อบริษัทที่ใช้รถยนต์",
+      "col_6": null,
+      "col_7": "บริษัท ไอยรินรถเช่า จำกัด",
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "เลขที่หน้าที่ต้องการข้อมูล",
+      "col_6": null,
+      "col_7": 2,
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "จำนวนข้อมูลที่แสดงต่อ 1 หน้า",
+      "col_6": null,
+      "col_7": 10,
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "รูปแบบการ sorting",
+      "col_6": "asc  หรือ desc",
+      "col_7": "desc",
+      "col_8": null
+    },
+    {
+      "set": "-",
+      "col_5": "ฟิลด์ที่ต้องการใช้ในการ order by ทุกฟิลด์",
+      "col_6": null,
+      "col_7": "id",
+      "col_8": null
+    }
+  ]
+}

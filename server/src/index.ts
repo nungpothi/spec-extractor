@@ -1,9 +1,11 @@
+import 'reflect-metadata';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import specUploadRouter from './routes/specUpload';
 import { clientBuildPath } from './config/paths';
+import { getAppDataSource } from './typeorm/dataSource';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -24,7 +26,16 @@ app.get('*', (req: Request, res: Response, next: NextFunction) => {
   return next();
 });
 
-app.listen(PORT, () => {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] Server listening on http://localhost:${PORT}`);
-});
+// Initialize DB then start server
+getAppDataSource()
+  .then(() => {
+    app.listen(PORT, () => {
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] Server listening on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    const timestamp = new Date().toISOString();
+    console.error(`[${timestamp}] Failed to initialize database:`, err?.message || err);
+    process.exit(1);
+  });
