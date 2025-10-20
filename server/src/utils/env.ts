@@ -11,6 +11,10 @@ type Env = {
   LLM_MODEL_PATH: string;
   LLM_QUANTIZE: string;
   OPENAI_API_KEY?: string;
+  // OpenRouter
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_MODEL?: string;
+  OPENROUTER_BASE_URL?: string;
 };
 
 let cachedEnv: Env | null = null;
@@ -30,6 +34,10 @@ export function loadEnv(): Env {
     LLM_MODEL_PATH: process.env.LLM_MODEL_PATH || '',
     LLM_QUANTIZE: process.env.LLM_QUANTIZE || 'Q4',
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    // OpenRouter
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
+    OPENROUTER_BASE_URL: process.env.OPENROUTER_BASE_URL,
   };
   return cachedEnv;
 }
