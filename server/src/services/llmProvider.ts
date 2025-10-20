@@ -16,8 +16,7 @@ export type LlmGenerateResult = {
 export function logLlmStartup() {
   const env = loadEnv();
   if (env.LLM_PROVIDER === 'ollama') {
-    const pathInfo = env.LLM_MODEL_PATH ? ` (path=${env.LLM_MODEL_PATH})` : '';
-    console.log(`[LLM] Provider=ollama, model=${env.LLM_MODEL}${pathInfo}, quantize=${env.LLM_QUANTIZE}`);
+    console.log(`[LLM] Provider=ollama, model=${env.LLM_MODEL}`);
   } else {
     console.log('[LLM] Provider=openai');
   }
@@ -29,7 +28,7 @@ export async function llmGenerate({ systemPrompt, userPrompt }: LlmGenerateArgs)
 
   if (env.LLM_PROVIDER === 'ollama') {
     try {
-      const out = await runOllama(prompt, env.LLM_MODEL, env.LLM_MODEL_PATH, env.LLM_QUANTIZE);
+      const out = await runOllama(prompt, env.LLM_MODEL);
       return { text: out, provider: 'ollama', model: env.LLM_MODEL };
     } catch (err: any) {
       const msg = err?.message || String(err);
@@ -49,17 +48,10 @@ function buildPrompt(systemPrompt: string | undefined, userPrompt: string) {
   return `System:\n${systemPrompt}\n\nUser:\n${userPrompt}`;
 }
 
-async function runOllama(prompt: string, model: string, modelPath?: string, quantize?: string): Promise<string> {
-  const args: string[] = ['run', model];
-  if (modelPath) {
-    args.push('--model-path', modelPath);
-  }
-  if (quantize) {
-    args.push('--quantize', quantize);
-  }
-  args.push(prompt);
+async function runOllama(prompt: string, model: string): Promise<string> {
+  const args: string[] = ['run', model, prompt];
 
-  const output = await spawnCollect('ollama', args, { timeoutMs: 120000 });
+  const output = await spawnCollect('ollama', args);
 
   const lower = output.stderr.toLowerCase();
   const likelyInsufficientVram = /out of memory|insufficient|cuda|cublas|no cuda|oom/.test(lower);

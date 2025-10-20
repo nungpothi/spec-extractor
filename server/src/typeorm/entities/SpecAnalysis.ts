@@ -26,10 +26,12 @@ export class SpecAnalysis {
   @Column('jsonb', { nullable: true })
   jsonRaw!: any | null;
 
+  @Column('integer', { nullable: true })
+  totalTokens!: number | null;
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt!: Date;
 }
-

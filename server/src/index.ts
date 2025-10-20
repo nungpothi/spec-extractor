@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import specUploadRouter from './routes/specUpload';
 import healthRouter from './routes/health';
+import specStatusRouter from './routes/specStatus';
 import { clientBuildPath } from './config/paths';
 import { getAppDataSource } from './typeorm/dataSource';
 import { logLlmStartup } from './services/llmProvider';
@@ -18,6 +19,7 @@ app.use(express.json());
 // API routes
 app.use(specUploadRouter);
 app.use(healthRouter);
+app.use(specStatusRouter);
 
 // Serve React static build in production
 app.use(express.static(clientBuildPath));

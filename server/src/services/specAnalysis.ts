@@ -29,11 +29,17 @@ export async function analyzeSpec(uploadId: string, projectId: string) {
   try {
     const jsonInput = await readExcelAsJson(xlsxPath);
 
+    // Estimate token usage (roughly 1 token ~ 4 chars)
+    const totalTokens = Math.ceil(JSON.stringify(jsonInput).length / 4);
+    record.totalTokens = totalTokens;
+    await repo.save(record);
+    console.log(`[INFO] Estimated token usage for uploadId=${uploadId}: ${totalTokens} tokens`);
+
     const jsonPath = path.join(specsDir, `${uploadId}.json`);
     await fs.promises.writeFile(jsonPath, JSON.stringify(jsonInput, null, 2), 'utf8');
 
     // AI agent call using local LLM provider with OpenAI fallback
-    const aiResult = await callExtractSpecExcelAgent(jsonInput);
+    const aiResult = await callExtractSpecExcelAgent(jsonInput, totalTokens);
 
     record.status = 'done';
     record.url = aiResult.url;
@@ -91,17 +97,22 @@ async function readExcelAsJson(filePath: string) {
   };
 }
 
-async function callExtractSpecExcelAgent(jsonInput: { sheetName: string; columns: string[]; rows: Array<Record<string, any>> }) {
+async function callExtractSpecExcelAgent(
+  jsonInput: { sheetName: string; columns: string[]; rows: Array<Record<string, any>> },
+  estimatedTokens: number
+) {
   const promptPath = locatePromptFile();
   let basePrompt = '';
   if (promptPath) {
     try { basePrompt = await fs.promises.readFile(promptPath, 'utf8'); } catch { basePrompt = ''; }
   }
 
-  const systemPrompt = `${basePrompt}\n\nRules:\n- Detect HTTP method (GET, POST, PUT, DELETE).\n- Ask before assumptions.\n- Output Markdown with exactly 8 columns and sections.\n- Respond in English with brief Thai in descriptions.\n\nCRITICAL: Output only valid minified JSON with keys: url, method, entity, markdown.`;
+  const systemPrompt = `${basePrompt}\n\n[DEBUG] estimatedTokens=${estimatedTokens}\n\nRules:\n- Detect HTTP method (GET, POST, PUT, DELETE).\n- Ask before assumptions.\n- Output Markdown with exactly 8 columns and sections.\n- Respond in English with brief Thai in descriptions.\n\nCRITICAL: Output only valid minified JSON with keys: url, method, entity, markdown.`;
   const userPrompt = `Excel sheet JSON input (single sheet):\n\n${JSON.stringify(jsonInput)}\n\nReturn only JSON as specified above.`;
 
   const result = await llmGenerate({ systemPrompt, userPrompt });
+  const ts = new Date().toISOString();
+  console.log(`[${ts}] Calling LLM provider with context: estimatedTokens=${estimatedTokens}`);
   const parsed = safeParseFirstJson(result.text);
   if (!parsed || !parsed.url || !parsed.method || !parsed.markdown) {
     throw new Error('AI response missing required fields');
