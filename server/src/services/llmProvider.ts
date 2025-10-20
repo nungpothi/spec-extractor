@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawnCollect } from '../utils/process';
 import { loadEnv } from '../utils/env';
 
 export type LlmGenerateArgs = {
@@ -16,9 +16,10 @@ export type LlmGenerateResult = {
 export function logLlmStartup() {
   const env = loadEnv();
   if (env.LLM_PROVIDER === 'ollama') {
-    console.log(`[LLM] Using local model ${env.LLM_MODEL} from path ${env.LLM_MODEL_PATH} (quantize=${env.LLM_QUANTIZE})`);
+    const pathInfo = env.LLM_MODEL_PATH ? ` (path=${env.LLM_MODEL_PATH})` : '';
+    console.log(`[LLM] Provider=ollama, model=${env.LLM_MODEL}${pathInfo}, quantize=${env.LLM_QUANTIZE}`);
   } else {
-    console.log('[LLM] Falling back to OpenAI');
+    console.log('[LLM] Provider=openai');
   }
 }
 
@@ -108,33 +109,4 @@ async function runOpenAI(prompt: string): Promise<string> {
   return content;
 }
 
-function spawnCollect(cmd: string, args: string[], opts?: { timeoutMs?: number }): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    const child = spawn(cmd, args, { shell: false });
-    let stdout = '';
-    let stderr = '';
-    let finished = false;
-    const timeout = opts?.timeoutMs ? setTimeout(() => {
-      if (finished) return;
-      finished = true;
-      try { child.kill('SIGKILL'); } catch {}
-      resolve({ code: 124, stdout, stderr: stderr + '\n[timeout]' });
-    }, opts.timeoutMs) : null;
-
-    child.stdout.on('data', (d) => { stdout += d.toString(); });
-    child.stderr.on('data', (d) => { stderr += d.toString(); });
-    child.on('error', (e) => {
-      if (finished) return;
-      finished = true;
-      if (timeout) clearTimeout(timeout);
-      resolve({ code: 127, stdout, stderr: e?.message || String(e) });
-    });
-    child.on('close', (code) => {
-      if (finished) return;
-      finished = true;
-      if (timeout) clearTimeout(timeout);
-      resolve({ code: code ?? 0, stdout, stderr });
-    });
-  });
-}
-
+// spawnCollect moved to ../utils/process

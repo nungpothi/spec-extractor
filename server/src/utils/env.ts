@@ -26,7 +26,8 @@ export function loadEnv(): Env {
     DB_NAME: process.env.DB_NAME || 'specdb',
     LLM_PROVIDER: process.env.LLM_PROVIDER || 'ollama',
     LLM_MODEL: process.env.LLM_MODEL || 'llama3:8b',
-    LLM_MODEL_PATH: process.env.LLM_MODEL_PATH || '/mnt/c/Users/naja/.ollama/models',
+    // Do not assume any local filesystem path by default
+    LLM_MODEL_PATH: process.env.LLM_MODEL_PATH || '',
     LLM_QUANTIZE: process.env.LLM_QUANTIZE || 'Q4',
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   };
