@@ -1,0 +1,30 @@
+{
+  "name": "spec-extractor",
+  "version": "1.0.0",
+  "description": "API specification upload service",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nungpothi/spec-extractor.git"
+  },
+  "keywords": [
+    "api",
+    "spec",
+    "uploader"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nungpothi/spec-extractor/issues"
+  },
+  "homepage": "https://github.com/nungpothi/spec-extractor#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^2.0.2",
+    "uuid": "^13.0.0"
+  }
+}
