@@ -1,81 +1,17 @@
-Add an automatic Excel spec analysis system into the existing Node.js + TypeScript backend.
+Add support for an open-source local LLM model in the existing Node.js + TypeScript backend.
 
 Requirements:
-## Overview
-- The project already has an endpoint POST /api/spec/upload.
-- After a file is uploaded, the backend must automatically analyze it using the AI agent extract-spec-excel and save results to PostgreSQL using TypeORM.
+- Use an environment variable `LLM_MODEL` which can be changed to pick model name (e.g., "llama3-8b", "mistral-7b", "gpt-j-6b").
+- Install and configure inference using a lightweight open-source model compatible with consumer GPU (such as LLaMA 3 8B or Mistral 7B) that can run on an NVIDIA 4060.
+- Integrate with the previously created llmProvider layer (`llmGenerate({systemPrompt, userPrompt})`).
+- Add env variables:
+    LLM_MODEL=llama3-8b
+    LLM_MODEL_PATH=/models/llama3-8b
+    LLM_QUANTIZE=Q4 // optional quantization mode
+- The provider layer should dynamically load the model path and configuration from env, and if `LLM_PROVIDER=ollama`, launch the specified model via Ollama CLI or Docker, e.g.:
+`ollama run ${LLM_MODEL} --model-path ${LLM_MODEL_PATH} --quantize ${LLM_QUANTIZE}`
+- Ensure error handling: if model not found or GPU VRAM insufficient, fallback to `openai` provider automatically.
+- On startup log: “Using local model ${LLM_MODEL} from path ${LLM_MODEL_PATH}” or “Falling back to OpenAI”.
+- Document in README: which free/open models are supported, approximate VRAM required (e.g., 8 GB for 7B model, 12-16GB for 13B) with link to external benchmarking for RTX 4060. Use citations accordingly.
 
-## Database
-- Use PostgreSQL and TypeORM.
-- Create entity named SpecAnalysis with fields:
-  - id (uuid primary key)
-  - uploadId (uuid)
-  - projectId (string)
-  - status (string) // 'processing', 'done', 'failed'
-  - url (string, nullable)
-  - method (string, nullable)
-  - markdown (text, nullable)
-  - jsonRaw (jsonb, nullable)
-  - createdAt, updatedAt (timestamp)
-- Add migration or auto-sync configuration.
-
-## Logic flow
-1. When POST /api/spec/upload is called:
-   - Save the file to /data/uploads/specs/{uploadId}.xlsx
-   - Create a SpecAnalysis record with:
-     - uploadId, projectId, status = "processing"
-   - Respond immediately with success JSON (as already implemented)
-   - In background, call async function analyzeSpec(uploadId)
-
-2. Implement analyzeSpec(uploadId):
-   - Read the Excel file using 'exceljs'
-   - Convert the sheet into JSON structure:
-     {
-       "sheetName": "search-leasing-owner",
-       "columns": [...],
-       "rows": [...]
-     }
-   - Call the AI agent extract-spec-excel by executing Codex CLI command:
-     codex run extract-spec-excel --input ./data/uploads/specs/{uploadId}.json
-     or equivalent internal call (mock for now)
-   - Receive result: markdown + metadata (url, method, entity)
-   - Update SpecAnalysis record:
-     - status = "done"
-     - url, method, markdown, jsonRaw = all returned values
-   - If any error occurs:
-     - status = "failed"
-     - log the error message
-
-3. File management:
-   - After successful analysis, optionally move or delete the Excel file.
-   - Keep result in DB for later retrieval.
-
-## Example DB Record (after done)
-{
-  "uploadId": "8c5a1a3f-ef0f-4f76-a347-6b011b9a9f21",
-  "projectId": "TEMP-PJ-001",
-  "status": "done",
-  "url": "/leasing-service/api/v1/search-leasing-owner",
-  "method": "GET",
-  "markdown": "### Header | parameter | ...",
-  "jsonRaw": { "sheetName": "search-leasing-owner", "rows": [...] },
-  "createdAt": "2025-10-20T10:00:00Z",
-  "updatedAt": "2025-10-20T10:02:00Z"
-}
-
-## Technical notes
-- Keep everything inside backend (no new worker service).
-- Use async/await and proper error handling.
-- Use TypeORM Repository pattern.
-- Use English logs and messages.
-- Ensure database connection config (env variables) is stored in `.env`:
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASS=postgres
-DB_NAME=specdb
-
-- Make sure to initialize TypeORM connection in server startup before routes.
-- After implementation, the upload API should immediately trigger the background job and persist AI results to DB automatically.
-
-Output only the complete backend TypeScript source code (no explanations).
+Output only the updated/added TypeScript source files and README changes (no extra explanation).

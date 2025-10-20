@@ -4,6 +4,7 @@ import ExcelJS from 'exceljs';
 import { specsDir } from '../config/paths';
 import { SpecAnalysis } from '../typeorm/entities/SpecAnalysis';
 import { getAppDataSource } from '../typeorm/dataSource';
+import { llmGenerate } from './llmProvider';
 
 export async function startSpecAnalysis(uploadId: string, projectId: string) {
   analyzeSpec(uploadId, projectId).catch((err) => {
@@ -31,8 +32,8 @@ export async function analyzeSpec(uploadId: string, projectId: string) {
     const jsonPath = path.join(specsDir, `${uploadId}.json`);
     await fs.promises.writeFile(jsonPath, JSON.stringify(jsonInput, null, 2), 'utf8');
 
-    // Mock AI agent call (replace with real Codex CLI integration later)
-    const aiResult = await mockExtractSpecExcel(jsonPath, jsonInput);
+    // AI agent call using local LLM provider with OpenAI fallback
+    const aiResult = await callExtractSpecExcelAgent(jsonInput);
 
     record.status = 'done';
     record.url = aiResult.url;
@@ -90,23 +91,53 @@ async function readExcelAsJson(filePath: string) {
   };
 }
 
-async function mockExtractSpecExcel(
-  inputJsonPath: string,
-  jsonInput: { sheetName: string; columns: string[]; rows: Array<Record<string, any>> }
-) {
-  // Very naive inference for demo purposes only
-  const entity = jsonInput.sheetName.replace(/\s+/g, '-').toLowerCase();
-  const method = 'GET';
-  const url = `/${entity.startsWith('api') ? '' : 'api/'}v1/${entity}`.replace(/\/\//g, '/');
+async function callExtractSpecExcelAgent(jsonInput: { sheetName: string; columns: string[]; rows: Array<Record<string, any>> }) {
+  const promptPath = locatePromptFile();
+  let basePrompt = '';
+  if (promptPath) {
+    try { basePrompt = await fs.promises.readFile(promptPath, 'utf8'); } catch { basePrompt = ''; }
+  }
 
-  const markdown = `### Header\n\n| parameter | dataType | required | possibleValues | description | dataFormat | example | errorCode |\n|---|---|---|---|---|---|---|---|\n| Authorization | string | yes | Bearer | JWT token | header | Bearer <token> | 401 |\n\n### Query String\n\n| parameter | dataType | required | possibleValues | description | dataFormat | example | errorCode |\n|---|---|---|---|---|---|---|---|\n| q | string | no | - | คำค้นหา | text | owner | - |\n\n### Response\n\n| parameter | dataType | required | possibleValues | description | dataFormat | example | errorCode |\n|---|---|---|---|---|---|---|---|\n| data | array | yes | - | รายการผลลัพธ์ | json | [] | - |`;
+  const systemPrompt = `${basePrompt}\n\nRules:\n- Detect HTTP method (GET, POST, PUT, DELETE).\n- Ask before assumptions.\n- Output Markdown with exactly 8 columns and sections.\n- Respond in English with brief Thai in descriptions.\n\nCRITICAL: Output only valid minified JSON with keys: url, method, entity, markdown.`;
+  const userPrompt = `Excel sheet JSON input (single sheet):\n\n${JSON.stringify(jsonInput)}\n\nReturn only JSON as specified above.`;
 
+  const result = await llmGenerate({ systemPrompt, userPrompt });
+  const parsed = safeParseFirstJson(result.text);
+  if (!parsed || !parsed.url || !parsed.method || !parsed.markdown) {
+    throw new Error('AI response missing required fields');
+  }
   return {
-    url,
-    method,
-    entity,
-    markdown,
+    url: parsed.url,
+    method: parsed.method,
+    entity: parsed.entity || jsonInput.sheetName,
+    markdown: parsed.markdown,
     jsonRaw: jsonInput,
-    inputJsonPath,
   };
+}
+
+function locatePromptFile(): string | null {
+  const candidates = [
+    path.resolve(process.cwd(), 'PROMPTS', 'extract-spec-excel.md'),
+    path.resolve(process.cwd(), '..', 'PROMPTS', 'extract-spec-excel.md'),
+    path.resolve(__dirname, '..', '..', 'PROMPTS', 'extract-spec-excel.md'),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+function safeParseFirstJson(text: string): any | null {
+  try {
+    return JSON.parse(text);
+  } catch {}
+  const codeBlock = text.match(/```(?:json)?\n([\s\S]*?)\n```/i);
+  if (codeBlock) {
+    try { return JSON.parse(codeBlock[1]); } catch {}
+  }
+  const loose = text.match(/\{[\s\S]*\}/);
+  if (loose) {
+    try { return JSON.parse(loose[0]); } catch {}
+  }
+  return null;
 }

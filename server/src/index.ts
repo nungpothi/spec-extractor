@@ -6,6 +6,7 @@ import fs from 'fs';
 import specUploadRouter from './routes/specUpload';
 import { clientBuildPath } from './config/paths';
 import { getAppDataSource } from './typeorm/dataSource';
+import { logLlmStartup } from './services/llmProvider';
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -29,6 +30,7 @@ app.get('*', (req: Request, res: Response, next: NextFunction) => {
 // Initialize DB then start server
 getAppDataSource()
   .then(() => {
+    logLlmStartup();
     app.listen(PORT, () => {
       const timestamp = new Date().toISOString();
       console.log(`[${timestamp}] Server listening on http://localhost:${PORT}`);
