@@ -67,7 +67,7 @@ export default function SummaryButton({ sessionId }: SummaryButtonProps) {
         <button
           onClick={handleViewSummary}
           disabled={isLoading || !sessionId}
-          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-200 to-pink-200 px-4 py-2 text-sm font-medium text-purple-800 shadow-sm transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-200 to-pink-200 px-3 py-2 text-sm font-medium text-purple-800 shadow-sm transition hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading ? (
             <>
@@ -90,14 +90,14 @@ export default function SummaryButton({ sessionId }: SummaryButtonProps) {
       </div>
 
       {error && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-rose-700">
+        <div className="rounded-xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-rose-700">
           <p className="text-sm">{error}</p>
         </div>
       )}
 
-      {summaryText && isExpanded && (
-        <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-soft">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        {summaryText && isExpanded && (
+        <div className="rounded-xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-sm">
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
             Conversation Summary
           </h3>
           <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">

@@ -13,23 +13,29 @@ body,
 }
 
 body {
-  /* Use an explicit linear-gradient so Tailwind doesn't need to generate "from-sky-100" utilities for @apply */
-  background: linear-gradient(to bottom, #bae6fd, #ffffff, #fbcfe8);
+  background: linear-gradient(135deg, #fdf2f8 0%, #fef7ff 50%, #f3e8ff 100%);
   font-family: "Inter", system-ui, sans-serif;
-  color: #0f172a; /* brand.ink */
+  color: #0f172a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 9999px;
-  background-color: rgba(199, 210, 254, 0.7); /* brand.lilac / 70% */
+  border-radius: 4px;
+  background-color: rgba(148, 163, 184, 0.5);
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
 }

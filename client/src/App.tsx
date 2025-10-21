@@ -153,25 +153,28 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen px-4 pb-10 pt-12">
-      <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8">
-        <header className="rounded-3xl border border-white/60 bg-white/70 p-8 text-center shadow-soft backdrop-blur">
-          <h1 className="text-3xl font-semibold text-slate-900">Prompt Compiler</h1>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+      <div className="mx-auto max-w-4xl px-4 pb-32 pt-6">
+        <header className="mb-6 rounded-2xl border border-white/60 bg-white/80 p-6 text-center shadow-sm backdrop-blur-sm">
+          <h1 className="text-2xl font-semibold text-slate-900">Prompt Compiler</h1>
           <p className="mt-2 text-sm text-slate-600">
             Translate natural-language ideas into concise developer specifications.
           </p>
-          <div className="mt-6">
+          <div className="mt-4">
             <SummaryButton sessionId={sessionId} />
           </div>
         </header>
 
-        <main className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-soft backdrop-blur">
-          <div className="flex-1 overflow-y-auto px-6">
-            <ChatList items={messages} />
-            <div ref={endOfFeedRef} />
-          </div>
-          <ChatInput value={draft} onChange={setDraft} onSubmit={handleSubmit} disabled={isSubmitting} />
+        <main className="space-y-1">
+          <ChatList items={messages} />
+          <div ref={endOfFeedRef} />
         </main>
+      </div>
+      
+      <div className="fixed bottom-0 left-0 right-0 border-t border-slate-200/50 bg-white/90 backdrop-blur-sm">
+        <div className="mx-auto max-w-4xl px-4 py-4">
+          <ChatInput value={draft} onChange={setDraft} onSubmit={handleSubmit} disabled={isSubmitting} />
+        </div>
       </div>
     </div>
   );
