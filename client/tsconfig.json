@@ -11,7 +11,8 @@
     "noEmit": false,
     "jsx": "react-jsx",
     "strict": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "outDir": "dist",
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
