@@ -31,3 +31,7 @@ export interface UserMessage {
 }
 
 export type ChatEntry = UserMessage | AssistantMessage;
+
+export interface SummaryResponse {
+  summaryText: string;
+}

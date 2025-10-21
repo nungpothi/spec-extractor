@@ -5,6 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { initializeDataSource } from './data-source';
 import compilePromptRouter from './routes/compilePrompt';
+import summaryRouter from './routes/summary';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
 app.use('/api', compilePromptRouter);
+app.use('/api', summaryRouter);
 
 const clientBuildPath = path.resolve(__dirname, '../../client/dist');
 if (fs.existsSync(clientBuildPath)) {

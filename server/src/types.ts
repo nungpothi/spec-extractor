@@ -13,3 +13,7 @@ export interface PromptCompileResult {
 export interface PromptCompileResponse extends PromptCompileResult {
   sessionId: string;
 }
+
+export interface SummaryResponse {
+  summaryText: string;
+}

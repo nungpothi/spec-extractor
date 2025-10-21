@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './components/ChatInput.js';
 import ChatList from './components/ChatList.js';
+import SummaryButton from './components/SummaryButton.js';
 import {
   AssistantMessage,
   ChatEntry,
@@ -159,6 +160,9 @@ export default function App() {
           <p className="mt-2 text-sm text-slate-600">
             Translate natural-language ideas into concise developer specifications.
           </p>
+          <div className="mt-6">
+            <SummaryButton sessionId={sessionId} />
+          </div>
         </header>
 
         <main className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-soft backdrop-blur">
