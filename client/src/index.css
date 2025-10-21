@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-gradient-to-b from-sky-100 via-white to-rose-100 font-sans text-brand-ink antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-brand-lilac/70;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}

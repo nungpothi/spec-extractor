@@ -1,6 +1,6 @@
 export interface PromptCompileRequestBody {
   userText: string;
-  previousContext?: PromptCompileResult;
+  sessionId?: string;
 }
 
 export interface PromptCompileResult {
@@ -8,4 +8,8 @@ export interface PromptCompileResult {
   uiMock: string;
   apiSpec: string;
   dbSchema: string;
+}
+
+export interface PromptCompileResponse extends PromptCompileResult {
+  sessionId: string;
 }

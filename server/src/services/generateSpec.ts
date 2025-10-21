@@ -1,14 +1,12 @@
 import { PromptCompileResult } from '../types';
 import { extractJson } from '../utils/parseJson';
 
-const PROMPT_TEMPLATE = `You are a software system designer. Analyze the following user request and generate a structured system specification.
-Input:
-"""
-{{input}}
-"""
+const PROMPT_TEMPLATE = `You are a software system designer.
+Analyze the following user request and generate a structured system specification.
+Input: "{{input}}"
 Output JSON:
 {
-  "summary": "describe main objective in concise developer language",
+  "summary": "main objective in concise developer language",
   "uiMock": "<html or react code snippet for UI mock>",
   "apiSpec": "markdown table showing URL, Method, Header, Body, Response",
   "dbSchema": "markdown table showing table name, fields, types"
@@ -16,19 +14,15 @@ Output JSON:
 
 type Provider = 'openai' | 'openrouter' | 'ollama';
 
-export async function compilePrompt(
-  userText: string,
-  previousContext?: PromptCompileResult
-): Promise<PromptCompileResult> {
+export async function compilePrompt(userText: string): Promise<PromptCompileResult> {
   const provider = resolveProvider();
-  const input = buildInput(userText, previousContext);
-  const prompt = PROMPT_TEMPLATE.replace('{{input}}', input);
+  const prompt = PROMPT_TEMPLATE.replace('{{input}}', escapeForPrompt(userText));
   const raw = await dispatch(provider, prompt);
   return extractJson(raw);
 }
 
 function resolveProvider(): Provider {
-  const explicit = process.env.PROMPT_COMPILER_PROVIDER?.toLowerCase();
+  const explicit = process.env.LLM_PROVIDER?.toLowerCase();
   if (explicit === 'openai' || explicit === 'openrouter' || explicit === 'ollama') {
     return explicit;
   }
@@ -37,13 +31,12 @@ function resolveProvider(): Provider {
   return 'ollama';
 }
 
-function buildInput(userText: string, previousContext?: PromptCompileResult): string {
-  const trimmed = userText.trim();
-  if (!previousContext) {
-    return trimmed;
-  }
-  const contextString = JSON.stringify(previousContext, null, 2);
-  return `Previous specification:\n${contextString}\n\nNew instructions:\n${trimmed}`;
+function escapeForPrompt(value: string): string {
+  return value
+    .trim()
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n');
 }
 
 async function dispatch(provider: Provider, prompt: string): Promise<string> {

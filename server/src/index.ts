@@ -3,6 +3,7 @@ import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { initializeDataSource } from './data-source';
 import compilePromptRouter from './routes/compilePrompt';
 
 dotenv.config();
@@ -26,7 +27,21 @@ if (fs.existsSync(clientBuildPath)) {
   });
 }
 
-app.listen(PORT, () => {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] Prompt Compiler backend listening on http://localhost:${PORT}`);
-});
+async function bootstrap() {
+  try {
+    await initializeDataSource();
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] Database connection established`);
+  } catch (error) {
+    const timestamp = new Date().toISOString();
+    console.error(`[${timestamp}] Failed to initialize data source`, error);
+    process.exit(1);
+  }
+
+  app.listen(PORT, () => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] Prompt Compiler backend listening on http://localhost:${PORT}`);
+  });
+}
+
+bootstrap();
