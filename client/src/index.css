@@ -13,7 +13,12 @@ body,
 }
 
 body {
-  @apply bg-gradient-to-b from-sky-100 via-white to-rose-100 font-sans text-brand-ink antialiased;
+  /* Use an explicit linear-gradient so Tailwind doesn't need to generate "from-sky-100" utilities for @apply */
+  background: linear-gradient(to bottom, #bae6fd, #ffffff, #fbcfe8);
+  font-family: "Inter", system-ui, sans-serif;
+  color: #0f172a; /* brand.ink */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar {
@@ -21,9 +26,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply rounded-full bg-brand-lilac/70;
+  border-radius: 9999px;
+  background-color: rgba(199, 210, 254, 0.7); /* brand.lilac / 70% */
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }

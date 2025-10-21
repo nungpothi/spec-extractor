@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import ChatInput from './components/ChatInput';
-import ChatList from './components/ChatList';
+import ChatInput from './components/ChatInput.js';
+import ChatList from './components/ChatList.js';
 import {
   AssistantMessage,
   ChatEntry,
   PromptCompileResponse,
   UserMessage,
-} from './types';
+} from './types.js';
 
 const SESSION_STORAGE_KEY = 'prompt-compiler:session-id';
 

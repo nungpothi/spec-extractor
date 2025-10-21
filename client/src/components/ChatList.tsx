@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ChatEntry } from '../types';
+import { ChatEntry } from '../types.js';
 
 interface ChatListProps {
   items: ChatEntry[];
