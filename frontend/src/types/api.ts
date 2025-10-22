@@ -32,3 +32,33 @@ export interface PreviewRequest {
 export interface PreviewResponse {
   html: string;
 }
+
+// Authentication Types
+export interface RegisterRequest {
+  phone: string;
+  email: string;
+  password: string;
+}
+
+export interface RegisterResponse {
+  id: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  role: string;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  phone: string;
+  role: string;
+}
+
+export type UserRole = 'ADMIN' | 'VISITOR';

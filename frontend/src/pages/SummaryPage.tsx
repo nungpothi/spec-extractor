@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSpecStore } from '../stores';
+import { useSpecStore, useAuthStore } from '../stores';
 import { useCopyToClipboard } from '../hooks';
-import { Button, LoadingSpinner, ErrorMessage } from '../components';
+import { Button, LoadingSpinner, ErrorMessage, Navbar } from '../components';
 
 export const SummaryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,11 +15,22 @@ export const SummaryPage: React.FC = () => {
     clearError,
   } = useSpecStore();
 
+  const { isAuthenticated, checkAuthStatus } = useAuthStore();
   const { copyToClipboard } = useCopyToClipboard();
 
   useEffect(() => {
-    loadSpecs();
-  }, [loadSpecs]);
+    checkAuthStatus();
+    if (isAuthenticated) {
+      loadSpecs();
+    }
+  }, [loadSpecs, checkAuthStatus, isAuthenticated]);
+
+  // Redirect to welcome page if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/welcome');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this specification?')) {
@@ -44,16 +55,8 @@ export const SummaryPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6">
-      <header className="max-w-6xl mx-auto mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-700">All JSON Specifications</h1>
-        <button 
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-sky-300 hover:bg-sky-400 text-white rounded shadow transition-colors"
-        >
-          กลับหน้าหลัก
-        </button>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
+      <Navbar />
 
       {error && (
         <ErrorMessage

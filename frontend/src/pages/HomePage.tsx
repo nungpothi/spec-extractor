@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSpecStore } from '../stores';
-import { useJsonValidator, useCopyToClipboard } from '../hooks';
-import { Button, LoadingSpinner, ErrorMessage } from '../components';
+import React, {useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useAuthStore, useSpecStore} from '../stores';
+import {useCopyToClipboard, useJsonValidator} from '../hooks';
+import {ErrorMessage, LoadingSpinner, Navbar} from '../components';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [jsonInput, setJsonInput] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-  
+
+  const { isAuthenticated, checkAuthStatus } = useAuthStore();
   const {
     specs,
     previewHtml,
@@ -27,29 +28,39 @@ export const HomePage: React.FC = () => {
   const { copyToClipboard } = useCopyToClipboard();
 
   useEffect(() => {
-    loadSpecs();
-  }, [loadSpecs]);
+    checkAuthStatus();
+    if (isAuthenticated) {
+      loadSpecs();
+    }
+  }, [loadSpecs, checkAuthStatus, isAuthenticated]);
+
+  // Redirect to welcome page if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/welcome');
+    }
+  }, [isAuthenticated, navigate]);
 
   // Add click handler for copy buttons in the preview
   useEffect(() => {
     const handleCopyClick = async (event: Event) => {
       const target = event.target as HTMLElement;
       const button = target.closest('.spec-copy-btn') as HTMLElement;
-      
+
       if (button) {
         const content = button.getAttribute('data-content');
         const type = button.getAttribute('data-copy');
-        
+
         if (content) {
           const success = await copyToClipboard(content);
           if (success) {
             // Add visual feedback for icon buttons
             button.classList.add('copied');
-            
+
             // Create a temporary "Copied!" tooltip or change icon color
             const originalTitle = button.getAttribute('title');
             button.setAttribute('title', 'Copied!');
-            
+
             setTimeout(() => {
               button.classList.remove('copied');
               if (originalTitle) {
@@ -117,15 +128,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
-      <header className="max-w-5xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-700">JSON Preview & Storage Tool</h1>
-        <button 
-          onClick={() => navigate('/summary')}
-          className="px-4 py-2 bg-sky-300 hover:bg-sky-400 text-white rounded shadow transition-colors"
-        >
-          ดูทั้งหมด
-        </button>
-      </header>
+      <Navbar />
 
       {error && (
         <ErrorMessage
@@ -169,7 +172,7 @@ export const HomePage: React.FC = () => {
       {/* Preview Section */}
       {previewHtml && (
         <section className="max-w-5xl mx-auto">
-          <div 
+          <div
             ref={previewRef}
             className="preview-sections"
           >
