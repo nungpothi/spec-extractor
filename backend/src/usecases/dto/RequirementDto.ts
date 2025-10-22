@@ -1,7 +1,12 @@
 export interface CreateRequirementRequestDto {
   content: string;
   is_private: boolean;
-  status?: string;
+}
+
+export interface UpdateRequirementRequestDto {
+  content: string;
+  is_private: boolean;
+  status: string;
 }
 
 export interface CreateRequirementResponseDto {

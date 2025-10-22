@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { RequirementService } from '../services';
-import type { RequirementItem, CreateRequirementRequest } from '../types';
+import type { RequirementItem, CreateRequirementRequest, UpdateRequirementRequest } from '../types';
 
 interface RequirementState {
   requirements: RequirementItem[];
@@ -10,6 +10,7 @@ interface RequirementState {
   // Actions
   loadRequirements: () => Promise<void>;
   createRequirement: (data: CreateRequirementRequest) => Promise<void>;
+  updateRequirement: (id: string, data: UpdateRequirementRequest) => Promise<void>;
   clearError: () => void;
 }
 
@@ -43,6 +44,23 @@ export const useRequirementStore = create<RequirementState>((set, get) => ({
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to create requirement',
+        isLoading: false 
+      });
+      throw error; // Re-throw to handle in component
+    }
+  },
+
+  updateRequirement: async (id: string, data: UpdateRequirementRequest) => {
+    set({ isLoading: true, error: null });
+    
+    try {
+      await RequirementService.updateRequirement(id, data);
+      
+      // Reload requirements after successful update
+      await get().loadRequirements();
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to update requirement',
         isLoading: false 
       });
       throw error; // Re-throw to handle in component

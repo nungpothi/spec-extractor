@@ -2,6 +2,7 @@ import axios from 'axios';
 import type {
   ApiResponse,
   CreateRequirementRequest,
+  UpdateRequirementRequest,
   CreateRequirementResponse,
   RequirementItem,
 } from '../types';
@@ -31,6 +32,16 @@ export class RequirementService {
     }
     
     throw new Error(response.data.errors.join(', ') || 'Failed to create requirement');
+  }
+
+  static async updateRequirement(id: string, data: UpdateRequirementRequest): Promise<CreateRequirementResponse> {
+    const response = await api.put<ApiResponse<CreateRequirementResponse>>(`/requirements/${id}`, data);
+    
+    if (response.data.status && response.data.results.length > 0) {
+      return response.data.results[0];
+    }
+    
+    throw new Error(response.data.errors.join(', ') || 'Failed to update requirement');
   }
 
   static async getAllRequirements(): Promise<RequirementItem[]> {

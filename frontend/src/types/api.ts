@@ -67,11 +67,17 @@ export type UserRole = 'ADMIN' | 'VISITOR';
 export interface CreateRequirementRequest {
   content: string;
   is_private: boolean;
+}
+
+export interface UpdateRequirementRequest {
+  content: string;
+  is_private: boolean;
   status: string;
 }
 
 export interface CreateRequirementResponse {
   id: string;
+  status?: string;
 }
 
 export interface RequirementItem {

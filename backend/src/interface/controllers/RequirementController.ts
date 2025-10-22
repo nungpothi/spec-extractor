@@ -2,9 +2,11 @@ import { Request, Response } from 'express';
 import {
   CreateRequirementUseCase,
   GetAllRequirementsUseCase,
+  UpdateRequirementUseCase,
 } from '../../usecases/requirements';
 import {
   CreateRequirementRequestDto,
+  UpdateRequirementRequestDto,
 } from '../../usecases/dto';
 import { RequirementRepository } from '../../infrastructure/repositories';
 import { RequirementStatus } from '../../domain/entities';
@@ -12,11 +14,13 @@ import { RequirementStatus } from '../../domain/entities';
 export class RequirementController {
   private createRequirementUseCase: CreateRequirementUseCase;
   private getAllRequirementsUseCase: GetAllRequirementsUseCase;
+  private updateRequirementUseCase: UpdateRequirementUseCase;
 
   constructor() {
     const requirementRepository = new RequirementRepository();
     this.createRequirementUseCase = new CreateRequirementUseCase(requirementRepository);
     this.getAllRequirementsUseCase = new GetAllRequirementsUseCase(requirementRepository);
+    this.updateRequirementUseCase = new UpdateRequirementUseCase(requirementRepository);
   }
 
   createRequirement = async (req: Request, res: Response): Promise<void> => {
@@ -31,19 +35,19 @@ export class RequirementController {
         return;
       }
 
-      const { content, is_private, status }: CreateRequirementRequestDto = req.body;
+      const { content, is_private }: CreateRequirementRequestDto = req.body;
 
       const result = await this.createRequirementUseCase.execute({
         content,
         isPrivate: is_private,
-        status: (status || 'NEW') as RequirementStatus,
+        status: 'NEW', // Always default to NEW
         userId: req.user.userId,
       });
 
       res.status(201).json({
         status: true,
         message: 'saved',
-        results: [result],
+        results: [{ id: result.id, status: 'NEW' }],
         errors: [],
       });
     } catch (error) {
@@ -87,6 +91,70 @@ export class RequirementController {
       res.status(statusCode).json({
         status: false,
         message: 'fetch_failed',
+        results: [],
+        errors: [errorMessage],
+      });
+    }
+  };
+
+  updateRequirement = async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({
+          status: false,
+          message: 'unauthorized',
+          results: [],
+          errors: ['User not authenticated'],
+        });
+        return;
+      }
+
+      // Only ADMIN users can update requirements
+      if (req.user.role !== 'ADMIN') {
+        res.status(403).json({
+          status: false,
+          message: 'access_denied',
+          results: [],
+          errors: ['Only ADMIN users can update requirements'],
+        });
+        return;
+      }
+
+      const { id } = req.params;
+      
+      if (!id) {
+        res.status(400).json({
+          status: false,
+          message: 'invalid_request',
+          results: [],
+          errors: ['Requirement ID is required'],
+        });
+        return;
+      }
+
+      const { content, is_private, status }: UpdateRequirementRequestDto = req.body;
+
+      const result = await this.updateRequirementUseCase.execute({
+        requirementId: id,
+        content,
+        isPrivate: is_private,
+        status: status as RequirementStatus,
+        userId: req.user.userId,
+      });
+
+      res.status(200).json({
+        status: true,
+        message: 'updated',
+        results: [{ id: result.id }],
+        errors: [],
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update requirement';
+      const statusCode = errorMessage.includes('Not found') ? 404 : 400;
+      
+      res.status(statusCode).json({
+        status: false,
+        message: 'update_failed',
         results: [],
         errors: [errorMessage],
       });

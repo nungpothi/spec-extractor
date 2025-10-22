@@ -67,6 +67,27 @@ export class RequirementRepository implements IRequirementRepository {
     return this.mapToEntity(savedEntity);
   }
 
+  async update(requirement: Requirement): Promise<Requirement> {
+    const entity = this.mapToDatabase(requirement);
+    
+    await this.repository.update(requirement.id, {
+      content: entity.content,
+      is_private: entity.is_private,
+      status: entity.status,
+      updated_at: new Date(),
+    });
+
+    const updatedEntity = await this.repository.findOne({
+      where: { id: requirement.id },
+    });
+
+    if (!updatedEntity) {
+      throw new Error('Failed to update requirement');
+    }
+
+    return this.mapToEntity(updatedEntity);
+  }
+
   async delete(id: string): Promise<void> {
     await this.repository.softDelete(id);
   }

@@ -2,14 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRequirementStore, useAuthStore } from '../stores';
 import { LoadingSpinner, ErrorMessage, Navbar } from '../components';
-import type { RequirementStatus } from '../types';
+import type { RequirementStatus, RequirementItem } from '../types';
 
 export const RequirementPage: React.FC = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
-  const [status, setStatus] = useState<RequirementStatus>('NEW');
   const [showWarning, setShowWarning] = useState(false);
+  
+  // Edit state
+  const [editingRequirement, setEditingRequirement] = useState<RequirementItem | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [editIsPrivate, setEditIsPrivate] = useState(false);
+  const [editStatus, setEditStatus] = useState<RequirementStatus>('NEW');
 
   const { isAuthenticated, user, checkAuthStatus } = useAuthStore();
   const { 
@@ -17,7 +22,8 @@ export const RequirementPage: React.FC = () => {
     isLoading, 
     error, 
     loadRequirements, 
-    createRequirement, 
+    createRequirement,
+    updateRequirement,
     clearError 
   } = useRequirementStore();
 
@@ -57,16 +63,51 @@ export const RequirementPage: React.FC = () => {
       await createRequirement({
         content: content.trim(),
         is_private: isPrivate,
-        status: status,
+        // Status will default to 'NEW' on backend
       });
       
       // Reset form
       setContent('');
       setIsPrivate(false);
-      setStatus('NEW');
       
       // Show success message
       alert('Requirement saved successfully!');
+    } catch (error) {
+      // Error is handled by the store
+    }
+  };
+
+  const handleEdit = (requirement: RequirementItem) => {
+    setEditingRequirement(requirement);
+    setEditContent(requirement.content);
+    setEditIsPrivate(requirement.is_private);
+    setEditStatus(requirement.status as RequirementStatus);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingRequirement(null);
+    setEditContent('');
+    setEditIsPrivate(false);
+    setEditStatus('NEW');
+  };
+
+  const handleUpdateRequirement = async () => {
+    if (!editingRequirement || !editContent.trim()) {
+      return;
+    }
+
+    try {
+      await updateRequirement(editingRequirement.id, {
+        content: editContent.trim(),
+        is_private: editIsPrivate,
+        status: editStatus,
+      });
+      
+      // Reset edit state
+      handleCancelEdit();
+      
+      // Show success message
+      alert('Requirement updated successfully!');
     } catch (error) {
       // Error is handled by the store
     }
@@ -113,7 +154,7 @@ export const RequirementPage: React.FC = () => {
             placeholder="Describe your requirement here..."
           />
           
-          <div className="flex flex-wrap items-center justify-between mt-3 space-y-2 md:space-y-0">
+          <div className="flex items-center justify-between mt-3">
             <div className="flex items-center space-x-2">
               <label className="flex items-center space-x-2 text-slate-600 cursor-pointer">
                 <input
@@ -131,16 +172,6 @@ export const RequirementPage: React.FC = () => {
                 </p>
               )}
             </div>
-            
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as RequirementStatus)}
-              className="border border-slate-200 rounded p-2 bg-white/70 text-slate-700 focus:ring-2 focus:ring-sky-200"
-            >
-              <option value="NEW">NEW</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="DONE">DONE</option>
-            </select>
           </div>
           
           <div className="flex justify-end mt-4">
@@ -160,7 +191,7 @@ export const RequirementPage: React.FC = () => {
             Requirements
           </h2>
           <p className="text-slate-600 text-sm mb-3">
-            ADMIN can see all requirements. VISITOR can see their own or public ones.
+            ADMIN can see and edit all requirements. VISITOR can see their own or public ones.
           </p>
           
           {isLoading && requirements.length === 0 ? (
@@ -180,6 +211,9 @@ export const RequirementPage: React.FC = () => {
                     <th className="border border-slate-200 p-2 text-left">Status</th>
                     <th className="border border-slate-200 p-2 text-left">Created By</th>
                     <th className="border border-slate-200 p-2 text-left">Date</th>
+                    {isAdmin && (
+                      <th className="border border-slate-200 p-2 text-left">Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -215,6 +249,16 @@ export const RequirementPage: React.FC = () => {
                       <td className="border border-slate-200 p-2">
                         {new Date(requirement.created_at).toLocaleDateString()}
                       </td>
+                      {isAdmin && (
+                        <td className="border border-slate-200 p-2">
+                          <button
+                            onClick={() => handleEdit(requirement)}
+                            className="text-xs bg-sky-200 hover:bg-sky-300 text-slate-700 px-2 py-1 rounded transition-colors"
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -222,6 +266,60 @@ export const RequirementPage: React.FC = () => {
             </div>
           )}
         </section>
+
+        {/* Edit Requirement Section (ADMIN Only) */}
+        {isAdmin && editingRequirement && (
+          <section className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+            <h2 className="text-2xl font-semibold text-slate-700 mb-4">
+              Edit Requirement (ADMIN Only)
+            </h2>
+            
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="w-full h-40 p-3 border border-slate-200 rounded-lg bg-white/70 font-mono text-slate-700 focus:ring-2 focus:ring-sky-200 transition-colors"
+              placeholder="Edit requirement content..."
+            />
+            
+            <div className="flex items-center justify-between mt-3">
+              <label className="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={editIsPrivate}
+                  onChange={(e) => setEditIsPrivate(e.target.checked)}
+                  className="accent-sky-400"
+                />
+                <span>Private</span>
+              </label>
+              
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value as RequirementStatus)}
+                className="border border-slate-200 rounded p-2 bg-white/70 text-slate-700 focus:ring-2 focus:ring-sky-200"
+              >
+                <option value="NEW">NEW</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="DONE">DONE</option>
+              </select>
+            </div>
+            
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                onClick={handleCancelEdit}
+                className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded shadow transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateRequirement}
+                disabled={isLoading || !editContent.trim()}
+                className="bg-sky-300 hover:bg-sky-400 disabled:bg-slate-200 disabled:text-slate-400 text-white px-6 py-2 rounded shadow transition-colors"
+              >
+                {isLoading ? <LoadingSpinner size="sm" /> : 'Update'}
+              </button>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
