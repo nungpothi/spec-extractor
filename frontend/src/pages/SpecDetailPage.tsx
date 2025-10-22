@@ -92,7 +92,7 @@ export const SpecDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -100,28 +100,37 @@ export const SpecDetailPage: React.FC = () => {
 
   if (!currentSpec) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Specification not found</h2>
-          <Button onClick={() => navigate('/')}>
+          <h2 className="text-xl font-semibold mb-4 text-slate-700">Specification not found</h2>
+          <button 
+            onClick={() => navigate('/')}
+            className="px-4 py-2 bg-sky-300 hover:bg-sky-400 text-white rounded shadow transition-colors"
+          >
             กลับหน้าหลัก
-          </Button>
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6">
       <header className="max-w-6xl mx-auto mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Specification Detail</h1>
+        <h1 className="text-2xl font-bold text-slate-700">Specification Detail</h1>
         <div className="flex space-x-2">
-          <Button variant="secondary" onClick={() => navigate('/summary')}>
+          <button 
+            onClick={() => navigate('/summary')}
+            className="px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded shadow transition-colors"
+          >
             ดูทั้งหมด
-          </Button>
-          <Button onClick={() => navigate('/')}>
+          </button>
+          <button 
+            onClick={() => navigate('/')}
+            className="px-4 py-2 bg-sky-300 hover:bg-sky-400 text-white rounded shadow transition-colors"
+          >
             กลับหน้าหลัก
-          </Button>
+          </button>
         </div>
       </header>
 
@@ -135,13 +144,13 @@ export const SpecDetailPage: React.FC = () => {
 
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Metadata */}
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold mb-4">Specification Information</h2>
+        <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <h2 className="text-lg font-semibold mb-4 text-slate-700">Specification Information</h2>
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt className="font-medium text-gray-700">ID:</dt>
+              <dt className="font-medium text-slate-600">ID:</dt>
               <dd className="mt-1">
-                <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+                <code className="bg-slate-100 px-2 py-1 rounded text-sm text-slate-700">
                   {currentSpec.id}
                 </code>
               </dd>
@@ -150,70 +159,68 @@ export const SpecDetailPage: React.FC = () => {
         </div>
 
         {/* JSON Data */}
-        <div className="bg-white p-6 rounded shadow">
+        <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">JSON Data</h2>
-            <Button
-              variant="secondary"
-              size="sm"
+            <h2 className="text-lg font-semibold text-slate-700">JSON Data</h2>
+            <button
               onClick={handleCopyJson}
+              className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded text-sm transition-colors"
             >
               {copySuccess === 'json' ? 'Copied!' : 'Copy JSON'}
-            </Button>
+            </button>
           </div>
-          <pre className="bg-gray-100 p-4 rounded overflow-auto max-h-96 text-sm">
-            <code>
+          <pre className="bg-slate-50 p-4 rounded-lg overflow-auto max-h-96 text-sm border border-slate-200">
+            <code className="text-slate-700">
               {JSON.stringify(currentSpec.json_data, null, 2)}
             </code>
           </pre>
         </div>
 
         {/* Preview HTML */}
-        <div className="bg-white p-6 rounded shadow">
+        <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Preview HTML</h2>
-            <Button
-              variant="secondary"
-              size="sm"
+            <h2 className="text-lg font-semibold text-slate-700">Preview HTML</h2>
+            <button
               onClick={handleCopyHtml}
+              className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded text-sm transition-colors"
             >
               {copySuccess === 'html' ? 'Copied!' : 'Copy HTML'}
-            </Button>
+            </button>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-medium mb-2">Rendered Output:</h3>
+              <h3 className="font-medium mb-2 text-slate-600">Rendered Output:</h3>
               <div 
                 ref={previewRef}
-                className="border p-4 rounded bg-gray-50 overflow-auto max-h-96"
+                className="border border-slate-200 p-4 rounded-lg bg-white/60 overflow-auto max-h-96"
                 dangerouslySetInnerHTML={{ __html: currentSpec.preview_html }}
               />
             </div>
             <div>
-              <h3 className="font-medium mb-2">HTML Source:</h3>
-              <pre className="bg-gray-100 p-4 rounded overflow-auto max-h-96 text-sm">
-                <code>{currentSpec.preview_html}</code>
+              <h3 className="font-medium mb-2 text-slate-600">HTML Source:</h3>
+              <pre className="bg-slate-50 p-4 rounded-lg overflow-auto max-h-96 text-sm border border-slate-200">
+                <code className="text-slate-700">{currentSpec.preview_html}</code>
               </pre>
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold mb-4">Actions</h2>
+        <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <h2 className="text-lg font-semibold mb-4 text-slate-700">Actions</h2>
           <div className="flex space-x-4">
-            <Button
-              variant="primary"
+            <button
               onClick={() => navigate(`/?copy=${currentSpec.id}`)}
+              className="bg-green-300 hover:bg-green-400 text-slate-700 px-4 py-2 rounded shadow transition-colors"
             >
               Copy to Editor
-            </Button>
-            <Button
-              variant="danger"
+            </button>
+            <button
               onClick={handleDelete}
+              className="bg-red-300 hover:bg-red-400 text-slate-700 px-4 py-2 rounded shadow transition-colors"
             >
               Delete Specification
-            </Button>
+            </button>
           </div>
         </div>
       </div>

@@ -2,58 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles for specification preview */
-.preview-sections .p-4.space-y-4 {
-  padding: 0;
-  space-y: 1rem;
+/* Custom styles for specification preview with pastel theme */
+.preview-sections .space-y-4 {
+  gap: 1rem;
 }
 
-.preview-sections .p-4.space-y-4 > section {
+.preview-sections .space-y-4 > section {
   margin-bottom: 1rem;
 }
 
+/* Pastel theme markdown table styling */
 .markdown-body table {
   border-collapse: collapse;
   margin: 0;
   width: 100%;
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .markdown-body th,
 .markdown-body td {
-  border: 1px solid #d1d5db;
+  border: 1px solid #cbd5e1;
   padding: 8px 12px;
   text-align: left;
 }
 
 .markdown-body th {
-  background-color: #f3f4f6;
+  background-color: rgba(241, 245, 249, 0.8);
   font-weight: 600;
+  color: #475569;
 }
 
 .markdown-body tr:nth-child(even) {
-  background-color: #f9fafb;
+  background-color: rgba(248, 250, 252, 0.6);
 }
 
-/* JSON syntax highlighting */
+/* JSON syntax highlighting with pastel colors */
 .json-preview .key {
-  color: #dc2626;
+  color: #be185d;
   font-weight: 500;
 }
 
 .json-preview .string {
-  color: #059669;
+  color: #047857;
 }
 
 .json-preview .number {
-  color: #2563eb;
+  color: #1d4ed8;
 }
 
 .json-preview .boolean {
-  color: #7c3aed;
+  color: #6d28d9;
 }
 
 .json-preview .null {
-  color: #6b7280;
+  color: #64748b;
   font-style: italic;
 }
 
@@ -62,10 +64,20 @@
   color: #374151;
 }
 
-/* Copy button hover effects */
+/* Enhanced copy button styling */
+.spec-copy-btn {
+  transition: all 0.2s ease-in-out;
+}
+
 .spec-copy-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Glassmorphism effect for sections */
+.backdrop-blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* Preview section animations */
@@ -74,7 +86,12 @@
 }
 
 .preview-section:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced gradient background */
+.bg-gradient-to-b {
+  background-attachment: fixed;
 }
 
 /* Responsive spacing for vertical layout */
@@ -82,9 +99,34 @@
   .space-y-6 > * + * {
     margin-top: 1rem;
   }
+  
+  .backdrop-blur {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
 }
 
 /* Ensure sections stack properly */
 .preview-sections section {
   width: 100%;
+}
+
+/* Loading spinner pastel theme */
+.text-blue-600 {
+  color: #0ea5e9;
+}
+
+/* Error message pastel styling */
+.text-red-600 {
+  color: #dc2626;
+}
+
+/* Enhanced button transitions */
+.transition-colors {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Soft shadow for better depth */
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }

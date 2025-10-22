@@ -111,12 +111,15 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
       <header className="max-w-5xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-bold">JSON Preview & Storage Tool</h1>
-        <Button onClick={() => navigate('/summary')}>
+        <h1 className="text-2xl font-bold text-slate-700">JSON Preview & Storage Tool</h1>
+        <button 
+          onClick={() => navigate('/summary')}
+          className="px-4 py-2 bg-sky-300 hover:bg-sky-400 text-white rounded shadow transition-colors"
+        >
           ดูทั้งหมด
-        </Button>
+        </button>
       </header>
 
       {error && (
@@ -128,11 +131,11 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* JSON Input Section */}
-      <section className="max-w-5xl mx-auto bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-2">วาง JSON ที่นี่</h2>
+      <section className="max-w-5xl mx-auto bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100">
+        <h2 className="font-semibold mb-2 text-slate-700">วาง JSON ที่นี่</h2>
         <textarea
           id="json-input"
-          className="w-full border p-2 rounded h-64 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border border-slate-200 focus:ring-2 focus:ring-sky-200 p-2 rounded-lg h-64 font-mono text-sm bg-white/70 transition-colors"
           placeholder="Paste your JSON here..."
           value={jsonInput}
           onChange={(e) => setJsonInput(e.target.value)}
@@ -141,19 +144,20 @@ export const HomePage: React.FC = () => {
           <div className="text-red-600 text-sm mt-1">{jsonError}</div>
         )}
         <div className="flex justify-end mt-3 space-x-2">
-          <Button
-            variant="success"
+          <button
             onClick={handlePreview}
             disabled={isLoading || !jsonInput.trim()}
+            className="bg-emerald-300 hover:bg-emerald-400 text-slate-700 px-4 py-2 rounded shadow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? <LoadingSpinner size="sm" /> : 'Preview'}
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={handleSave}
             disabled={isLoading || !jsonInput.trim()}
+            className="bg-sky-300 hover:bg-sky-400 text-slate-700 px-4 py-2 rounded shadow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? <LoadingSpinner size="sm" /> : 'Save'}
-          </Button>
+          </button>
         </div>
       </section>
 
@@ -170,47 +174,45 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* Summary Table Section */}
-      <section className="max-w-5xl mx-auto bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-3">สรุป JSON ทั้งหมด</h2>
+      <section className="max-w-5xl mx-auto bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100">
+        <h2 className="font-semibold mb-3 text-slate-700">สรุป JSON ทั้งหมด</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
-            <thead className="bg-gray-200">
+            <thead className="bg-slate-100/60">
               <tr>
-                <th className="border p-2 text-left">#</th>
-                <th className="border p-2 text-left">Summary</th>
-                <th className="border p-2 text-left">Created At</th>
-                <th className="border p-2 text-left">Actions</th>
+                <th className="border border-slate-200 p-2 text-left text-slate-600">#</th>
+                <th className="border border-slate-200 p-2 text-left text-slate-600">Summary</th>
+                <th className="border border-slate-200 p-2 text-left text-slate-600">Created At</th>
+                <th className="border border-slate-200 p-2 text-left text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody>
               {specs.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="border p-4 text-center text-gray-500">
+                  <td colSpan={4} className="border border-slate-200 p-4 text-center text-slate-500">
                     No specifications found
                   </td>
                 </tr>
               ) : (
                 specs.map((spec, index) => (
-                  <tr key={spec.id} className="hover:bg-gray-50">
-                    <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{spec.summary}</td>
-                    <td className="border p-2">{formatDate(spec.created_at)}</td>
-                    <td className="border p-2">
+                  <tr key={spec.id} className="hover:bg-slate-50/40 transition-colors">
+                    <td className="border border-slate-200 p-2 text-slate-700">{index + 1}</td>
+                    <td className="border border-slate-200 p-2 text-slate-700">{spec.summary}</td>
+                    <td className="border border-slate-200 p-2 text-slate-700">{formatDate(spec.created_at)}</td>
+                    <td className="border border-slate-200 p-2">
                       <div className="flex space-x-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
+                        <button
                           onClick={() => navigate(`/spec/${spec.id}`)}
+                          className="bg-blue-200 hover:bg-blue-300 text-slate-700 px-3 py-1 rounded text-xs transition-colors"
                         >
                           View
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
+                        </button>
+                        <button
                           onClick={() => handleDelete(spec.id)}
+                          className="bg-red-200 hover:bg-red-300 text-slate-700 px-3 py-1 rounded text-xs transition-colors"
                         >
                           Delete
-                        </Button>
+                        </button>
                       </div>
                     </td>
                   </tr>

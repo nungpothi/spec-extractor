@@ -27,11 +27,11 @@ export class JsonToHtmlConverterService {
     // Summary section
     if (data.summary) {
       sections.push(`
-        <section class="bg-white shadow rounded p-4 mb-4">
-          <h2 class="font-semibold mb-2">Summary</h2>
-          <div class="border p-3 rounded flex justify-between items-center">
-            <span class="text-gray-800">${this.escapeHtml(data.summary)}</span>
-            <button class="spec-copy-btn text-sm bg-gray-200 px-2 py-1 rounded hover:bg-gray-300" data-copy="summary" data-content="${this.escapeHtml(data.summary)}">Copy</button>
+        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <h2 class="font-semibold mb-2 text-slate-700">Summary</h2>
+          <div class="border border-slate-200 p-3 rounded-lg flex justify-between items-center bg-pink-50/60">
+            <span class="text-slate-800">${this.escapeHtml(data.summary)}</span>
+            <button class="spec-copy-btn text-sm bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded transition-colors" data-copy="summary" data-content="${this.escapeHtml(data.summary)}">Copy</button>
           </div>
         </section>
       `);
@@ -40,9 +40,9 @@ export class JsonToHtmlConverterService {
     // UI Mock section
     if (data.uiMock) {
       sections.push(`
-        <section class="bg-white shadow rounded p-4 mb-4">
-          <h2 class="font-semibold mb-2">UI Mock</h2>
-          <div class="border p-3 rounded bg-gray-50">
+        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <h2 class="font-semibold mb-2 text-slate-700">UI Mock</h2>
+          <div class="border border-slate-200 p-3 rounded-lg bg-blue-50/60">
             ${data.uiMock}
           </div>
         </section>
@@ -53,9 +53,9 @@ export class JsonToHtmlConverterService {
     if (data.apiSpec) {
       const apiHtml = this.convertMarkdownTableToHtml(data.apiSpec);
       sections.push(`
-        <section class="bg-white shadow rounded p-4 mb-4">
-          <h2 class="font-semibold mb-2">API Spec</h2>
-          <div class="markdown-body border p-3 rounded bg-gray-50 overflow-auto max-h-64">
+        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <h2 class="font-semibold mb-2 text-slate-700">API Spec</h2>
+          <div class="markdown-body border border-slate-200 p-3 rounded-lg bg-green-50/60 overflow-auto h-64">
             ${apiHtml}
           </div>
         </section>
@@ -65,15 +65,15 @@ export class JsonToHtmlConverterService {
     // Database Schema section
     if (data.dbSchema) {
       sections.push(`
-        <section class="bg-white shadow rounded p-4 mb-4">
-          <h2 class="font-semibold mb-2">Database Schema</h2>
-          <pre class="border p-3 rounded bg-gray-50 whitespace-pre-wrap text-sm">${this.escapeHtml(data.dbSchema)}</pre>
-          <button class="spec-copy-btn text-sm bg-gray-200 px-2 py-1 rounded mt-2 hover:bg-gray-300" data-copy="dbSchema" data-content="${this.escapeHtml(data.dbSchema)}">Copy</button>
+        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <h2 class="font-semibold mb-2 text-slate-700">Database Schema</h2>
+          <pre class="border border-slate-200 p-3 rounded-lg bg-yellow-50/60 whitespace-pre-wrap text-sm">${this.escapeHtml(data.dbSchema)}</pre>
+          <button class="spec-copy-btn text-sm bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded mt-2 transition-colors" data-copy="dbSchema" data-content="${this.escapeHtml(data.dbSchema)}">Copy</button>
         </section>
       `);
     }
 
-    return `<div class="p-4 space-y-4">${sections.join('')}</div>`;
+    return `<div class="space-y-4">${sections.join('')}</div>`;
   }
 
   private convertMarkdownTableToHtml(markdown: string): string {
