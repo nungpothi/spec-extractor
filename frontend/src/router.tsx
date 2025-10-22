@@ -1,10 +1,19 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { HomePage, SummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage } from './pages';
+import { ProtectedRoute } from './components';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage />,
+    element: <RequirementPage />,
+  },
+  {
+    path: '/preview',
+    element: (
+      <ProtectedRoute requiredRole="ADMIN">
+        <HomePage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/welcome',
@@ -20,15 +29,27 @@ export const router = createBrowserRouter([
   },
   {
     path: '/summary',
-    element: <SummaryPage />,
+    element: (
+      <ProtectedRoute requiredRole="ADMIN">
+        <SummaryPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/spec/:id',
-    element: <SpecDetailPage />,
+    element: (
+      <ProtectedRoute requiredRole="ADMIN">
+        <SpecDetailPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/user',
-    element: <UserPage />,
+    element: (
+      <ProtectedRoute requiredRole="ADMIN">
+        <UserPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/requirement',

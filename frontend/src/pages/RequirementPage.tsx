@@ -9,6 +9,7 @@ export const RequirementPage: React.FC = () => {
   const [content, setContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   
   // Edit state
   const [editingRequirement, setEditingRequirement] = useState<RequirementItem | null>(null);
@@ -29,6 +30,7 @@ export const RequirementPage: React.FC = () => {
 
   const isAdmin = user?.role === 'ADMIN';
 
+  // Load requirements when authenticated
   useEffect(() => {
     checkAuthStatus();
     if (isAuthenticated) {
@@ -36,12 +38,15 @@ export const RequirementPage: React.FC = () => {
     }
   }, [isAuthenticated, user, checkAuthStatus, loadRequirements]);
 
-  // Redirect to welcome page if not authenticated
+  // Update time every second for unauthenticated users
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/welcome');
+      const timer = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
+      return () => clearInterval(timer);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   // Handle privacy toggle
   useEffect(() => {
@@ -127,7 +132,39 @@ export const RequirementPage: React.FC = () => {
   };
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
+        <Navbar />
+        
+        <main className="max-w-md mx-auto bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <section className="text-center space-y-4">
+            <h2 className="text-3xl font-bold text-slate-700">Welcome</h2>
+            <p className="text-slate-600">Please log in to access the Requirement module and submit your requirements</p>
+            <div className="text-6xl font-bold text-slate-800 tracking-wider">
+              {currentTime.toLocaleTimeString('th-TH', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false
+              })}
+            </div>
+            <div className="space-y-2">
+              <button
+                onClick={() => navigate('/login')}
+                className="w-full bg-sky-300 hover:bg-sky-400 text-white font-semibold py-2 rounded shadow transition-colors"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => navigate('/register')}
+                className="w-full bg-emerald-300 hover:bg-emerald-400 text-slate-700 font-semibold py-2 rounded shadow transition-colors"
+              >
+                Register
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
   }
 
   return (

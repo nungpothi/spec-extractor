@@ -15,6 +15,8 @@ export const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
     navigate('/');
   };
 
+  const isAdmin = user?.role === 'ADMIN';
+
   return (
     <nav className={`max-w-5xl mx-auto flex justify-between items-center ${className}`}>
       <Link to="/" className="text-2xl font-bold text-slate-700 hover:text-slate-900 transition-colors">
@@ -26,27 +28,31 @@ export const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
           <>
             <li>
               <Link to="/" className="hover:text-slate-900 transition-colors">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/summary" className="hover:text-slate-900 transition-colors">
-                Summary
-              </Link>
-            </li>
-            <li>
-              <Link to="/requirement" className="hover:text-slate-900 transition-colors">
                 Requirement
               </Link>
             </li>
-            <li>
-              <Link to="/user" className="hover:text-slate-900 transition-colors">
-                User
-              </Link>
-            </li>
+            {isAdmin && (
+              <>
+                <li>
+                  <Link to="/preview" className="hover:text-slate-900 transition-colors">
+                    Preview
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/summary" className="hover:text-slate-900 transition-colors">
+                    Summary
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/user" className="hover:text-slate-900 transition-colors">
+                    User
+                  </Link>
+                </li>
+              </>
+            )}
             <li>
               <span className="text-sm text-slate-500">
-                {user?.email}
+                {user?.email} ({user?.role})
               </span>
             </li>
             <li>
