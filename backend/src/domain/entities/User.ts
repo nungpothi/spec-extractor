@@ -64,9 +64,15 @@ export class User {
     return this.role === 'ADMIN';
   }
 
-  public getPublicProfile(): Omit<User, 'passwordHash'> {
-    const { passwordHash, ...publicProfile } = this;
-    return publicProfile;
+  public getPublicProfile(): Pick<User, 'id' | 'phone' | 'email' | 'role' | 'createdAt' | 'updatedAt'> {
+    return {
+      id: this.id,
+      phone: this.phone,
+      email: this.email,
+      role: this.role,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
   }
 
   private isValidEmail(): boolean {
@@ -75,7 +81,7 @@ export class User {
   }
 
   private isValidPhone(): boolean {
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    const phoneRegex = /^[\+]?[0-9][\d]{0,15}$/;
     return phoneRegex.test(this.phone);
   }
 }
