@@ -35,6 +35,11 @@ export const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
               </Link>
             </li>
             <li>
+              <Link to="/requirement" className="hover:text-slate-900 transition-colors">
+                Requirement
+              </Link>
+            </li>
+            <li>
               <Link to="/user" className="hover:text-slate-900 transition-colors">
                 User
               </Link>

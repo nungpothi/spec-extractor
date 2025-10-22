@@ -62,3 +62,21 @@ export interface UserProfile {
 }
 
 export type UserRole = 'ADMIN' | 'VISITOR';
+
+// Requirement Types
+export interface CreateRequirementRequest {
+  content: string;
+  is_private: boolean;
+}
+
+export interface CreateRequirementResponse {
+  id: string;
+}
+
+export interface RequirementItem {
+  id: string;
+  content: string;
+  is_private: boolean;
+  created_by: string;
+  created_at: string;
+}

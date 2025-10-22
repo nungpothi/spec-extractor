@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { SpecificationEntity, UserEntity } from './entities';
+import { SpecificationEntity, UserEntity, RequirementEntity } from './entities';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,7 +11,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_DATABASE || 'json_preview_db',
   synchronize: process.env.NODE_ENV === 'development',
   logging: process.env.NODE_ENV === 'development',
-  entities: [SpecificationEntity, UserEntity],
+  entities: [SpecificationEntity, UserEntity, RequirementEntity],
   migrations: ['src/infrastructure/database/migrations/*.ts'],
   subscribers: ['src/infrastructure/database/subscribers/*.ts'],
 });

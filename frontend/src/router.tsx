@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { HomePage, SummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage } from './pages';
+import { HomePage, SummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage } from './pages';
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +29,10 @@ export const router = createBrowserRouter([
   {
     path: '/user',
     element: <UserPage />,
+  },
+  {
+    path: '/requirement',
+    element: <RequirementPage />,
   },
   {
     path: '*',
