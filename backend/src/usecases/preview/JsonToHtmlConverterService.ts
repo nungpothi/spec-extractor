@@ -27,11 +27,15 @@ export class JsonToHtmlConverterService {
     // Summary section
     if (data.summary) {
       sections.push(`
-        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+        <section class="relative bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <button class="spec-copy-btn absolute top-3 right-3 z-10 rounded-md p-2 bg-white/70 hover:bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-800 transition-all" data-copy="summary" data-content="${this.escapeHtml(data.summary)}" aria-label="Copy Summary">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+          </button>
           <h2 class="font-semibold mb-2 text-slate-700">Summary</h2>
-          <div class="border border-slate-200 p-3 rounded-lg flex justify-between items-center bg-pink-50/60">
+          <div class="border border-slate-200 p-3 rounded-lg bg-pink-50/60">
             <span class="text-slate-800">${this.escapeHtml(data.summary)}</span>
-            <button class="spec-copy-btn text-sm bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded transition-colors" data-copy="summary" data-content="${this.escapeHtml(data.summary)}">Copy</button>
           </div>
         </section>
       `);
@@ -40,7 +44,12 @@ export class JsonToHtmlConverterService {
     // UI Mock section
     if (data.uiMock) {
       sections.push(`
-        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+        <section class="relative bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <button class="spec-copy-btn absolute top-3 right-3 z-10 rounded-md p-2 bg-white/70 hover:bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-800 transition-all" data-copy="uiMock" data-content="${this.escapeHtml(data.uiMock)}" aria-label="Copy UI Mock">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+          </button>
           <h2 class="font-semibold mb-2 text-slate-700">UI Mock</h2>
           <div class="border border-slate-200 p-3 rounded-lg bg-blue-50/60">
             ${data.uiMock}
@@ -53,7 +62,12 @@ export class JsonToHtmlConverterService {
     if (data.apiSpec) {
       const apiHtml = this.convertMarkdownTableToHtml(data.apiSpec);
       sections.push(`
-        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+        <section class="relative bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <button class="spec-copy-btn absolute top-3 right-3 z-10 rounded-md p-2 bg-white/70 hover:bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-800 transition-all" data-copy="apiSpec" data-content="${this.escapeHtml(data.apiSpec)}" aria-label="Copy API Spec">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+          </button>
           <h2 class="font-semibold mb-2 text-slate-700">API Spec</h2>
           <div class="markdown-body border border-slate-200 p-3 rounded-lg bg-green-50/60 overflow-auto h-64">
             ${apiHtml}
@@ -65,10 +79,14 @@ export class JsonToHtmlConverterService {
     // Database Schema section
     if (data.dbSchema) {
       sections.push(`
-        <section class="bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+        <section class="relative bg-white/80 backdrop-blur p-4 rounded-2xl shadow-md border border-slate-100 mb-4">
+          <button class="spec-copy-btn absolute top-3 right-3 z-10 rounded-md p-2 bg-white/70 hover:bg-white shadow border border-slate-200 text-slate-600 hover:text-slate-800 transition-all" data-copy="dbSchema" data-content="${this.escapeHtml(data.dbSchema)}" aria-label="Copy DB Schema">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+          </button>
           <h2 class="font-semibold mb-2 text-slate-700">Database Schema</h2>
           <pre class="border border-slate-200 p-3 rounded-lg bg-yellow-50/60 whitespace-pre-wrap text-sm">${this.escapeHtml(data.dbSchema)}</pre>
-          <button class="spec-copy-btn text-sm bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded mt-2 transition-colors" data-copy="dbSchema" data-content="${this.escapeHtml(data.dbSchema)}">Copy</button>
         </section>
       `);
     }

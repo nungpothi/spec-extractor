@@ -34,22 +34,27 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     const handleCopyClick = async (event: Event) => {
       const target = event.target as HTMLElement;
-      if (target.classList.contains('spec-copy-btn')) {
-        const content = target.getAttribute('data-content');
-        const type = target.getAttribute('data-copy');
+      const button = target.closest('.spec-copy-btn') as HTMLElement;
+      
+      if (button) {
+        const content = button.getAttribute('data-content');
+        const type = button.getAttribute('data-copy');
         
         if (content) {
           const success = await copyToClipboard(content);
           if (success) {
-            const originalText = target.textContent;
-            target.textContent = 'Copied!';
-            target.classList.add('bg-green-200');
-            target.classList.remove('bg-gray-200');
+            // Add visual feedback for icon buttons
+            button.classList.add('copied');
+            
+            // Create a temporary "Copied!" tooltip or change icon color
+            const originalTitle = button.getAttribute('title');
+            button.setAttribute('title', 'Copied!');
             
             setTimeout(() => {
-              target.textContent = originalText;
-              target.classList.remove('bg-green-200');
-              target.classList.add('bg-gray-200');
+              button.classList.remove('copied');
+              if (originalTitle) {
+                button.setAttribute('title', originalTitle);
+              }
             }, 2000);
           }
         }
