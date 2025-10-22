@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRequirementStore, useAuthStore } from '../stores';
 import { LoadingSpinner, ErrorMessage, Navbar } from '../components';
+import type { RequirementStatus } from '../types';
 
 export const RequirementPage: React.FC = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [status, setStatus] = useState<RequirementStatus>('NEW');
   const [showWarning, setShowWarning] = useState(false);
 
   const { isAuthenticated, user, checkAuthStatus } = useAuthStore();
@@ -24,11 +26,9 @@ export const RequirementPage: React.FC = () => {
   useEffect(() => {
     checkAuthStatus();
     if (isAuthenticated) {
-      if (isAdmin) {
-        loadRequirements();
-      }
+      loadRequirements();
     }
-  }, [isAuthenticated, user, checkAuthStatus, loadRequirements, isAdmin]);
+  }, [isAuthenticated, user, checkAuthStatus, loadRequirements]);
 
   // Redirect to welcome page if not authenticated
   useEffect(() => {
@@ -57,16 +57,31 @@ export const RequirementPage: React.FC = () => {
       await createRequirement({
         content: content.trim(),
         is_private: isPrivate,
+        status: status,
       });
       
       // Reset form
       setContent('');
       setIsPrivate(false);
+      setStatus('NEW');
       
       // Show success message
       alert('Requirement saved successfully!');
     } catch (error) {
       // Error is handled by the store
+    }
+  };
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'NEW':
+        return 'bg-blue-100 text-blue-800';
+      case 'IN_PROGRESS':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'DONE':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -98,22 +113,34 @@ export const RequirementPage: React.FC = () => {
             placeholder="Describe your requirement here..."
           />
           
-          <div className="flex items-center justify-between mt-3">
-            <label className="flex items-center space-x-2 text-slate-600 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isPrivate}
-                onChange={(e) => setIsPrivate(e.target.checked)}
-                className="accent-sky-400"
-              />
-              <span>Private</span>
-            </label>
+          <div className="flex flex-wrap items-center justify-between mt-3 space-y-2 md:space-y-0">
+            <div className="flex items-center space-x-2">
+              <label className="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isPrivate}
+                  onChange={(e) => setIsPrivate(e.target.checked)}
+                  className="accent-sky-400"
+                />
+                <span>Private</span>
+              </label>
+              
+              {showWarning && !isPrivate && (
+                <p className="text-sm text-red-500 animate-pulse">
+                  This message will be visible to others (Public)
+                </p>
+              )}
+            </div>
             
-            {showWarning && !isPrivate && (
-              <p className="text-sm text-red-500 animate-pulse">
-                This message will be visible to others (Public)
-              </p>
-            )}
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as RequirementStatus)}
+              className="border border-slate-200 rounded p-2 bg-white/70 text-slate-700 focus:ring-2 focus:ring-sky-200"
+            >
+              <option value="NEW">NEW</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="DONE">DONE</option>
+            </select>
           </div>
           
           <div className="flex justify-end mt-4">
@@ -127,65 +154,74 @@ export const RequirementPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Requirements List (ADMIN Only) */}
-        {isAdmin && (
-          <section className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
-            <h2 className="text-2xl font-semibold text-slate-700 mb-4">
-              All Requirements (ADMIN Only)
-            </h2>
-            
-            {isLoading && requirements.length === 0 ? (
-              <div className="flex justify-center py-8">
-                <LoadingSpinner size="lg" />
-              </div>
-            ) : requirements.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">No requirements found</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm border-collapse">
-                  <thead className="bg-slate-100 text-slate-700">
-                    <tr>
-                      <th className="border border-slate-200 p-2 text-left">#</th>
-                      <th className="border border-slate-200 p-2 text-left">Content</th>
-                      <th className="border border-slate-200 p-2 text-left">Visibility</th>
-                      <th className="border border-slate-200 p-2 text-left">Created By</th>
-                      <th className="border border-slate-200 p-2 text-left">Date</th>
+        {/* Requirements List */}
+        <section className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <h2 className="text-2xl font-semibold text-slate-700 mb-4">
+            Requirements
+          </h2>
+          <p className="text-slate-600 text-sm mb-3">
+            ADMIN can see all requirements. VISITOR can see their own or public ones.
+          </p>
+          
+          {isLoading && requirements.length === 0 ? (
+            <div className="flex justify-center py-8">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : requirements.length === 0 ? (
+            <p className="text-center text-slate-500 py-8">No requirements found</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead className="bg-slate-100 text-slate-700">
+                  <tr>
+                    <th className="border border-slate-200 p-2 text-left">#</th>
+                    <th className="border border-slate-200 p-2 text-left">Content</th>
+                    <th className="border border-slate-200 p-2 text-left">Visibility</th>
+                    <th className="border border-slate-200 p-2 text-left">Status</th>
+                    <th className="border border-slate-200 p-2 text-left">Created By</th>
+                    <th className="border border-slate-200 p-2 text-left">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {requirements.map((requirement, index) => (
+                    <tr key={requirement.id} className="hover:bg-slate-50">
+                      <td className="border border-slate-200 p-2">{index + 1}</td>
+                      <td className="border border-slate-200 p-2">
+                        <div className="max-w-md truncate" title={requirement.content}>
+                          {requirement.content}
+                        </div>
+                      </td>
+                      <td className="border border-slate-200 p-2">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            requirement.is_private
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-green-100 text-green-800'
+                          }`}
+                        >
+                          {requirement.is_private ? 'Private' : 'Public'}
+                        </span>
+                      </td>
+                      <td className="border border-slate-200 p-2">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(requirement.status)}`}
+                        >
+                          {requirement.status}
+                        </span>
+                      </td>
+                      <td className="border border-slate-200 p-2 font-mono text-xs">
+                        {requirement.created_by}
+                      </td>
+                      <td className="border border-slate-200 p-2">
+                        {new Date(requirement.created_at).toLocaleDateString()}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {requirements.map((requirement, index) => (
-                      <tr key={requirement.id} className="hover:bg-slate-50">
-                        <td className="border border-slate-200 p-2">{index + 1}</td>
-                        <td className="border border-slate-200 p-2">
-                          <div className="max-w-md truncate" title={requirement.content}>
-                            {requirement.content}
-                          </div>
-                        </td>
-                        <td className="border border-slate-200 p-2">
-                          <span
-                            className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                              requirement.is_private
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-green-100 text-green-800'
-                            }`}
-                          >
-                            {requirement.is_private ? 'Private' : 'Public'}
-                          </span>
-                        </td>
-                        <td className="border border-slate-200 p-2 font-mono text-xs">
-                          {requirement.created_by}
-                        </td>
-                        <td className="border border-slate-200 p-2">
-                          {new Date(requirement.created_at).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        )}
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );

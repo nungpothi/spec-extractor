@@ -67,6 +67,7 @@ export type UserRole = 'ADMIN' | 'VISITOR';
 export interface CreateRequirementRequest {
   content: string;
   is_private: boolean;
+  status: string;
 }
 
 export interface CreateRequirementResponse {
@@ -77,6 +78,9 @@ export interface RequirementItem {
   id: string;
   content: string;
   is_private: boolean;
+  status: string;
   created_by: string;
   created_at: string;
 }
+
+export type RequirementStatus = 'NEW' | 'IN_PROGRESS' | 'DONE';

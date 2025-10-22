@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { IRequirementRepository } from '../../domain/repositories';
-import { Requirement } from '../../domain/entities';
+import { Requirement, RequirementStatus } from '../../domain/entities';
 import { RequirementEntity } from '../database/entities';
 import { AppDataSource } from '../database/dataSource';
 
@@ -33,6 +33,17 @@ export class RequirementRepository implements IRequirementRepository {
       where: { is_private: false },
       order: { created_at: 'DESC' },
     });
+
+    return entities.map(entity => this.mapToEntity(entity));
+  }
+
+  async findByUserOrPublic(userId: string): Promise<Requirement[]> {
+    const entities = await this.repository
+      .createQueryBuilder('requirement')
+      .where('requirement.created_by = :userId', { userId })
+      .orWhere('requirement.is_private = false')
+      .orderBy('requirement.created_at', 'DESC')
+      .getMany();
 
     return entities.map(entity => this.mapToEntity(entity));
   }
@@ -75,6 +86,7 @@ export class RequirementRepository implements IRequirementRepository {
       entity.id,
       entity.content,
       entity.is_private,
+      entity.status as RequirementStatus,
       entity.created_by,
       entity.created_at,
       entity.updated_at
@@ -86,6 +98,7 @@ export class RequirementRepository implements IRequirementRepository {
       id: requirement.id,
       content: requirement.content,
       is_private: requirement.isPrivate,
+      status: requirement.status,
       created_by: requirement.createdBy,
       created_at: requirement.createdAt,
       updated_at: requirement.updatedAt,

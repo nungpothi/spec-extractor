@@ -1,9 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
+export type RequirementStatus = 'NEW' | 'IN_PROGRESS' | 'DONE';
+
 export class Requirement {
   public readonly id: string;
   public readonly content: string;
   public readonly isPrivate: boolean;
+  public readonly status: RequirementStatus;
   public readonly createdBy: string;
   public readonly createdAt: Date;
   public readonly updatedAt?: Date;
@@ -12,6 +15,7 @@ export class Requirement {
     id: string,
     content: string,
     isPrivate: boolean,
+    status: RequirementStatus,
     createdBy: string,
     createdAt: Date,
     updatedAt?: Date
@@ -19,6 +23,7 @@ export class Requirement {
     this.id = id;
     this.content = content;
     this.isPrivate = isPrivate;
+    this.status = status;
     this.createdBy = createdBy;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -27,12 +32,13 @@ export class Requirement {
   static create(
     content: string,
     isPrivate: boolean,
+    status: RequirementStatus,
     createdBy: string
   ): Requirement {
     const id = uuidv4();
     const createdAt = new Date();
 
-    return new Requirement(id, content, isPrivate, createdBy, createdAt);
+    return new Requirement(id, content, isPrivate, status, createdBy, createdAt);
   }
 
   public isValid(): boolean {
@@ -40,6 +46,8 @@ export class Requirement {
       this.id &&
       this.content &&
       typeof this.isPrivate === 'boolean' &&
+      this.status &&
+      ['NEW', 'IN_PROGRESS', 'DONE'].includes(this.status) &&
       this.createdBy &&
       this.createdAt &&
       this.content.trim().length > 0

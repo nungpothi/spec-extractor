@@ -21,6 +21,9 @@ export class RequirementEntity {
   @Column({ type: 'boolean', default: false })
   is_private!: boolean;
 
+  @Column({ type: 'varchar', length: 20, default: 'NEW' })
+  status!: string;
+
   @Column({ type: 'uuid' })
   created_by!: string;
 

@@ -1,9 +1,10 @@
 import { IRequirementRepository } from '../../domain/repositories';
-import { Requirement } from '../../domain/entities';
+import { Requirement, RequirementStatus } from '../../domain/entities';
 
 export interface CreateRequirementRequest {
   content: string;
   isPrivate: boolean;
+  status: RequirementStatus;
   userId: string;
 }
 
@@ -15,7 +16,7 @@ export class CreateRequirementUseCase {
   constructor(private requirementRepository: IRequirementRepository) {}
 
   async execute(request: CreateRequirementRequest): Promise<CreateRequirementResponse> {
-    const { content, isPrivate, userId } = request;
+    const { content, isPrivate, status, userId } = request;
 
     // Validate input
     if (!content || !content.trim()) {
@@ -26,10 +27,15 @@ export class CreateRequirementUseCase {
       throw new Error('User ID is required');
     }
 
+    if (!status || !['NEW', 'IN_PROGRESS', 'DONE'].includes(status)) {
+      throw new Error('Valid status is required');
+    }
+
     // Create requirement
     const requirement = Requirement.create(
       content.trim(),
       isPrivate,
+      status,
       userId
     );
 

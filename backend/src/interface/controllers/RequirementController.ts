@@ -7,6 +7,7 @@ import {
   CreateRequirementRequestDto,
 } from '../../usecases/dto';
 import { RequirementRepository } from '../../infrastructure/repositories';
+import { RequirementStatus } from '../../domain/entities';
 
 export class RequirementController {
   private createRequirementUseCase: CreateRequirementUseCase;
@@ -30,11 +31,12 @@ export class RequirementController {
         return;
       }
 
-      const { content, is_private }: CreateRequirementRequestDto = req.body;
+      const { content, is_private, status }: CreateRequirementRequestDto = req.body;
 
       const result = await this.createRequirementUseCase.execute({
         content,
         isPrivate: is_private,
+        status: (status || 'NEW') as RequirementStatus,
         userId: req.user.userId,
       });
 
