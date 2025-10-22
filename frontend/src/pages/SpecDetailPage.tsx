@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSpecStore } from '../stores';
 import { useCopyToClipboard } from '../hooks';
@@ -8,6 +8,7 @@ export const SpecDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [copySuccess, setCopySuccess] = useState<'json' | 'html' | null>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const {
     currentSpec,
@@ -25,6 +26,42 @@ export const SpecDetailPage: React.FC = () => {
       loadSpec(id);
     }
   }, [id, loadSpec]);
+
+  // Add click handler for copy buttons in the preview
+  useEffect(() => {
+    const handleCopyClick = async (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('spec-copy-btn')) {
+        const content = target.getAttribute('data-content');
+        
+        if (content) {
+          const success = await copyToClipboard(content);
+          if (success) {
+            const originalText = target.textContent;
+            target.textContent = 'Copied!';
+            target.classList.add('bg-green-200');
+            target.classList.remove('bg-gray-200');
+            
+            setTimeout(() => {
+              target.textContent = originalText;
+              target.classList.remove('bg-green-200');
+              target.classList.add('bg-gray-200');
+            }, 2000);
+          }
+        }
+      }
+    };
+
+    if (previewRef.current) {
+      previewRef.current.addEventListener('click', handleCopyClick);
+    }
+
+    return () => {
+      if (previewRef.current) {
+        previewRef.current.removeEventListener('click', handleCopyClick);
+      }
+    };
+  }, [currentSpec?.preview_html, copyToClipboard]);
 
   const handleCopyJson = async () => {
     if (currentSpec?.json_data) {
@@ -147,6 +184,7 @@ export const SpecDetailPage: React.FC = () => {
             <div>
               <h3 className="font-medium mb-2">Rendered Output:</h3>
               <div 
+                ref={previewRef}
                 className="border p-4 rounded bg-gray-50 overflow-auto max-h-96"
                 dangerouslySetInnerHTML={{ __html: currentSpec.preview_html }}
               />

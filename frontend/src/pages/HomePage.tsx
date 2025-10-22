@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSpecStore } from '../stores';
 import { useJsonValidator, useCopyToClipboard } from '../hooks';
@@ -8,6 +8,7 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [jsonInput, setJsonInput] = useState('');
   const [copySuccess, setCopySuccess] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
   
   const {
     specs,
@@ -28,6 +29,43 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     loadSpecs();
   }, [loadSpecs]);
+
+  // Add click handler for copy buttons in the preview
+  useEffect(() => {
+    const handleCopyClick = async (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('spec-copy-btn')) {
+        const content = target.getAttribute('data-content');
+        const type = target.getAttribute('data-copy');
+        
+        if (content) {
+          const success = await copyToClipboard(content);
+          if (success) {
+            const originalText = target.textContent;
+            target.textContent = 'Copied!';
+            target.classList.add('bg-green-200');
+            target.classList.remove('bg-gray-200');
+            
+            setTimeout(() => {
+              target.textContent = originalText;
+              target.classList.remove('bg-green-200');
+              target.classList.add('bg-gray-200');
+            }, 2000);
+          }
+        }
+      }
+    };
+
+    if (previewRef.current) {
+      previewRef.current.addEventListener('click', handleCopyClick);
+    }
+
+    return () => {
+      if (previewRef.current) {
+        previewRef.current.removeEventListener('click', handleCopyClick);
+      }
+    };
+  }, [previewHtml, copyToClipboard]);
 
   const handlePreview = async () => {
     clearJsonError();
@@ -128,9 +166,12 @@ export const HomePage: React.FC = () => {
             onClick={handleCopy}
             disabled={!previewHtml}
           >
-            {copySuccess ? 'Copied!' : 'Copy'}
+            {copySuccess ? 'Copied!' : 'Copy All'}
           </Button>
-          <div className="border p-2 rounded h-64 overflow-auto bg-gray-100 text-sm">
+          <div 
+            ref={previewRef}
+            className="border p-2 rounded min-h-64 overflow-auto bg-gray-100 text-sm"
+          >
             {previewHtml ? (
               <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
             ) : (
