@@ -28,6 +28,12 @@ export class SpecificationController {
   async getSpecById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      
+      if (!id) {
+        res.status(400).json(ApiResponseBuilder.error('ID parameter is required'));
+        return;
+      }
+      
       const spec = await this.getSpecificationByIdUseCase.execute(id);
       
       if (!spec) {
@@ -66,6 +72,12 @@ export class SpecificationController {
   async deleteSpec(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      
+      if (!id) {
+        res.status(400).json(ApiResponseBuilder.error('ID parameter is required'));
+        return;
+      }
+      
       await this.deleteSpecificationUseCase.execute(id);
       res.json(ApiResponseBuilder.deleted());
     } catch (error) {

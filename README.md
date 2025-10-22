@@ -38,20 +38,37 @@ A full-stack web application that allows users to paste JSON specifications and 
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm run install:all
+   npm install
    ```
 
-3. Set up PostgreSQL database
-4. Configure environment variables (see .env.example)
-5. Run migrations:
+3. Set up PostgreSQL database:
    ```bash
-   cd backend && npm run migration:run
+   # Create database
+   createdb json_preview_db
+   
+   # Import schema
+   psql json_preview_db < database_schema.sql
+   ```
+
+4. Configure environment variables:
+   ```bash
+   cp backend/.env.example backend/.env
+   # Update backend/.env with your database credentials
+   ```
+
+5. Build the applications:
+   ```bash
+   npm run build
    ```
 
 6. Start development servers:
    ```bash
    npm run dev
+   # OR use the automated script
+   ./dev-start.sh
    ```
+
+The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:8000`.
 
 ## Project Structure
 
