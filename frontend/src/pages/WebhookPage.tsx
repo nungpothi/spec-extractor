@@ -1,0 +1,185 @@
+import React, { useState, useEffect } from 'react';
+import { Navbar } from '../components';
+import { useAuthStore } from '../stores';
+import { webhookService } from '../services';
+import { WebhookLog } from '../types';
+
+export const WebhookPage: React.FC = () => {
+  const { user } = useAuthStore();
+  const [webhookUrl, setWebhookUrl] = useState<string>('');
+  const [webhookLogs, setWebhookLogs] = useState<WebhookLog[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentWebhookId, setCurrentWebhookId] = useState<string>('');
+
+  const generateWebhook = async () => {
+    try {
+      setIsLoading(true);
+      const response = await webhookService.generateWebhook();
+      if (response.status) {
+        const result = response.results[0];
+        setWebhookUrl(result.url);
+        setCurrentWebhookId(result.uuid);
+        setWebhookLogs([]); // Clear previous logs
+      }
+    } catch (error) {
+      console.error('Failed to generate webhook:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadWebhookLogs = async () => {
+    if (!currentWebhookId) return;
+    
+    try {
+      const response = await webhookService.getWebhookLogs(currentWebhookId);
+      if (response.status) {
+        setWebhookLogs(response.results);
+      }
+    } catch (error) {
+      console.error('Failed to load webhook logs:', error);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const formatJson = (obj: any) => {
+    try {
+      return JSON.stringify(obj, null, 2);
+    } catch {
+      return String(obj);
+    }
+  };
+
+  useEffect(() => {
+    if (currentWebhookId) {
+      loadWebhookLogs();
+      // Auto-refresh logs every 5 seconds
+      const interval = setInterval(loadWebhookLogs, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [currentWebhookId]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
+      <Navbar className="mb-8" />
+      
+      <main className="max-w-5xl mx-auto space-y-6">
+        <section id="webhook-generator" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <h2 className="text-2xl font-semibold text-slate-700 mb-4">Webhook Endpoint</h2>
+          <div className="flex items-center justify-between border border-slate-200 rounded-lg p-3 bg-white/70">
+            <input
+              type="text"
+              id="webhook-url"
+              readOnly
+              className="flex-1 bg-transparent text-slate-800 font-mono text-sm select-all outline-none"
+              value={webhookUrl || 'Click Generate to create your webhook URL'}
+              onClick={() => webhookUrl && copyToClipboard(webhookUrl)}
+            />
+            <button
+              id="btn-generate-webhook"
+              onClick={generateWebhook}
+              disabled={isLoading}
+              className="ml-3 bg-sky-300 hover:bg-sky-400 disabled:bg-slate-300 text-white px-4 py-1 rounded shadow transition-colors"
+            >
+              {isLoading ? 'Generating...' : 'Generate'}
+            </button>
+          </div>
+          <p className="text-slate-500 text-sm mt-2">
+            Use this unique URL to send test POST requests and inspect payloads. Click the URL to copy.
+          </p>
+        </section>
+
+        <section id="webhook-log" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold text-slate-700">Received Payloads</h2>
+            {currentWebhookId && (
+              <button
+                onClick={loadWebhookLogs}
+                className="text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded transition-colors"
+              >
+                Refresh
+              </button>
+            )}
+          </div>
+          
+          {webhookLogs.length === 0 ? (
+            <div className="text-center py-8 text-slate-500">
+              {currentWebhookId ? 'No requests received yet. Send a POST request to your webhook URL.' : 'Generate a webhook URL to start receiving requests.'}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead className="bg-slate-100 text-slate-700">
+                  <tr>
+                    <th className="border border-slate-200 p-2">#</th>
+                    <th className="border border-slate-200 p-2">Timestamp</th>
+                    <th className="border border-slate-200 p-2">Method</th>
+                    <th className="border border-slate-200 p-2">Headers</th>
+                    <th className="border border-slate-200 p-2">Body</th>
+                    <th className="border border-slate-200 p-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="webhook-table-body">
+                  {webhookLogs.map((log, index) => (
+                    <tr key={log.id} className="hover:bg-slate-50">
+                      <td className="border border-slate-200 p-2">{index + 1}</td>
+                      <td className="border border-slate-200 p-2">
+                        {new Date(log.created_at).toLocaleString()}
+                      </td>
+                      <td className="border border-slate-200 p-2">
+                        <span className={`px-2 py-1 rounded text-xs font-mono ${
+                          log.method === 'POST' ? 'bg-green-100 text-green-800' :
+                          log.method === 'GET' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {log.method}
+                        </span>
+                      </td>
+                      <td className="border border-slate-200 p-2 max-w-xs">
+                        <div className="overflow-hidden">
+                          <pre className="text-xs whitespace-pre-wrap break-all">
+                            {formatJson(log.headers).substring(0, 100)}
+                            {formatJson(log.headers).length > 100 && '...'}
+                          </pre>
+                        </div>
+                      </td>
+                      <td className="border border-slate-200 p-2 max-w-xs">
+                        <div className="overflow-hidden">
+                          <pre className="text-xs whitespace-pre-wrap break-all">
+                            {formatJson(log.body).substring(0, 100)}
+                            {formatJson(log.body).length > 100 && '...'}
+                          </pre>
+                        </div>
+                      </td>
+                      <td className="border border-slate-200 p-2">
+                        <div className="flex space-x-1">
+                          <button
+                            onClick={() => copyToClipboard(formatJson(log.headers))}
+                            className="text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 px-2 py-1 rounded"
+                            title="Copy Headers"
+                          >
+                            H
+                          </button>
+                          <button
+                            onClick={() => copyToClipboard(formatJson(log.body))}
+                            className="text-xs bg-green-200 hover:bg-green-300 text-green-800 px-2 py-1 rounded"
+                            title="Copy Body"
+                          >
+                            B
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+};

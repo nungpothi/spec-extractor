@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { HomePage, SummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage } from './pages';
+import { HomePage, SummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage, WebhookPage } from './pages';
 import { ProtectedRoute } from './components';
 
 export const router = createBrowserRouter([
@@ -54,6 +54,14 @@ export const router = createBrowserRouter([
   {
     path: '/requirement',
     element: <RequirementPage />,
+  },
+  {
+    path: '/webhook',
+    element: (
+      <ProtectedRoute>
+        <WebhookPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '*',

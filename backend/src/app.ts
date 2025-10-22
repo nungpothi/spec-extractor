@@ -31,7 +31,7 @@ import {
   createSpecificationRoutes,
   createPreviewRoutes,
 } from './interface';
-import { authRoutes, requirementRoutes } from './interface/routes';
+import { authRoutes, requirementRoutes, webhookRoutes } from './interface/routes';
 
 class Application {
   private app: express.Application;
@@ -94,6 +94,7 @@ class Application {
     this.app.use('/api', createPreviewRoutes(previewController));
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/requirements', requirementRoutes);
+    this.app.use('/api/webhook', webhookRoutes);
 
     // Health check
     this.app.get('/health', (req, res) => {

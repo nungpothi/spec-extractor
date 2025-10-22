@@ -90,3 +90,17 @@ export interface RequirementItem {
 }
 
 export type RequirementStatus = 'NEW' | 'IN_PROGRESS' | 'DONE';
+
+// Webhook Types
+export interface GenerateWebhookResponse {
+  uuid: string;
+  url: string;
+}
+
+export interface WebhookLog {
+  id: string;
+  method: string;
+  headers: Record<string, any>;
+  body: Record<string, any>;
+  created_at: string;
+}

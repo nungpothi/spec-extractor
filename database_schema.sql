@@ -108,3 +108,58 @@ COMMENT ON COLUMN requirements.content IS 'The requirement text content';
 COMMENT ON COLUMN requirements.is_private IS 'Whether the requirement is private (visible only to owner and admins)';
 COMMENT ON COLUMN requirements.status IS 'Current status of the requirement (NEW, IN_PROGRESS, DONE)';
 COMMENT ON COLUMN requirements.created_by IS 'User who created the requirement';
+
+-- Create webhooks table
+CREATE TABLE IF NOT EXISTS webhooks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    uuid_key UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL,
+    created_by UUID NULL,
+    updated_by UUID NULL,
+    deleted_by UUID NULL,
+    CONSTRAINT fk_webhooks_user_id FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Create webhook_logs table
+CREATE TABLE IF NOT EXISTS webhook_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    webhook_id UUID NOT NULL,
+    method VARCHAR(10) NOT NULL,
+    headers JSONB NOT NULL,
+    body JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_webhook_logs_webhook_id FOREIGN KEY (webhook_id) REFERENCES webhooks(id)
+);
+
+-- Add indexes for webhooks table
+CREATE INDEX IF NOT EXISTS idx_webhooks_uuid_key ON webhooks(uuid_key);
+CREATE INDEX IF NOT EXISTS idx_webhooks_user_id ON webhooks(user_id);
+CREATE INDEX IF NOT EXISTS idx_webhooks_created_at ON webhooks(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_webhooks_deleted_at ON webhooks(deleted_at);
+
+-- Add indexes for webhook_logs table
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_webhook_id ON webhook_logs(webhook_id);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_method ON webhook_logs(method);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_created_at ON webhook_logs(created_at DESC);
+
+-- Add GIN indexes for JSONB data in webhook_logs
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_headers_gin ON webhook_logs USING gin(headers);
+CREATE INDEX IF NOT EXISTS idx_webhook_logs_body_gin ON webhook_logs USING gin(body);
+
+-- Create trigger for webhooks updated_at
+CREATE TRIGGER update_webhooks_updated_at BEFORE UPDATE ON webhooks
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Add comments for webhooks tables
+COMMENT ON TABLE webhooks IS 'User-generated webhook endpoints for receiving HTTP requests';
+COMMENT ON COLUMN webhooks.uuid_key IS 'Unique UUID used in webhook URL for public access';
+COMMENT ON COLUMN webhooks.user_id IS 'User who owns this webhook';
+
+COMMENT ON TABLE webhook_logs IS 'Log of all HTTP requests received by webhook endpoints';
+COMMENT ON COLUMN webhook_logs.webhook_id IS 'Reference to the webhook that received this request';
+COMMENT ON COLUMN webhook_logs.method IS 'HTTP method used in the request';
+COMMENT ON COLUMN webhook_logs.headers IS 'HTTP headers received with the request';
+COMMENT ON COLUMN webhook_logs.body IS 'Request body data received with the request';
