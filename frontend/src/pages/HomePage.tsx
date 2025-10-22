@@ -111,8 +111,8 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <header className="max-w-5xl mx-auto mb-6 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 p-6 space-y-6">
+      <header className="max-w-5xl mx-auto flex items-center justify-between">
         <h1 className="text-2xl font-bold">JSON Preview & Storage Tool</h1>
         <Button onClick={() => navigate('/summary')}>
           ดูทั้งหมด
@@ -127,61 +127,50 @@ export const HomePage: React.FC = () => {
         />
       )}
 
-      <main className="max-w-5xl mx-auto grid md:grid-cols-2 gap-4">
-        <section className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold mb-2">วาง JSON ที่นี่</h2>
-          <textarea
-            id="json-input"
-            className="w-full border p-2 rounded h-64 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Paste your JSON here..."
-            value={jsonInput}
-            onChange={(e) => setJsonInput(e.target.value)}
-          />
-          {jsonError && (
-            <div className="text-red-600 text-sm mt-1">{jsonError}</div>
-          )}
-          <div className="flex justify-end mt-3 space-x-2">
-            <Button
-              variant="success"
-              onClick={handlePreview}
-              disabled={isLoading || !jsonInput.trim()}
-            >
-              {isLoading ? <LoadingSpinner size="sm" /> : 'Preview'}
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={isLoading || !jsonInput.trim()}
-            >
-              {isLoading ? <LoadingSpinner size="sm" /> : 'Save'}
-            </Button>
-          </div>
-        </section>
-
-        <section className="bg-white p-4 rounded shadow relative">
-          <h2 className="font-semibold mb-2">ตัวอย่าง Preview</h2>
+      {/* JSON Input Section */}
+      <section className="max-w-5xl mx-auto bg-white p-4 rounded shadow">
+        <h2 className="font-semibold mb-2">วาง JSON ที่นี่</h2>
+        <textarea
+          id="json-input"
+          className="w-full border p-2 rounded h-64 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Paste your JSON here..."
+          value={jsonInput}
+          onChange={(e) => setJsonInput(e.target.value)}
+        />
+        {jsonError && (
+          <div className="text-red-600 text-sm mt-1">{jsonError}</div>
+        )}
+        <div className="flex justify-end mt-3 space-x-2">
           <Button
-            variant="secondary"
-            size="sm"
-            className="absolute top-3 right-3"
-            onClick={handleCopy}
-            disabled={!previewHtml}
+            variant="success"
+            onClick={handlePreview}
+            disabled={isLoading || !jsonInput.trim()}
           >
-            {copySuccess ? 'Copied!' : 'Copy All'}
+            {isLoading ? <LoadingSpinner size="sm" /> : 'Preview'}
           </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isLoading || !jsonInput.trim()}
+          >
+            {isLoading ? <LoadingSpinner size="sm" /> : 'Save'}
+          </Button>
+        </div>
+      </section>
+
+      {/* Preview Section */}
+      {previewHtml && (
+        <section className="max-w-5xl mx-auto">
           <div 
             ref={previewRef}
-            className="border p-2 rounded min-h-64 overflow-auto bg-gray-100 text-sm"
+            className="preview-sections"
           >
-            {previewHtml ? (
-              <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-            ) : (
-              <p className="text-gray-500 text-center mt-20">ยังไม่มีตัวอย่าง</p>
-            )}
+            <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
           </div>
         </section>
-      </main>
+      )}
 
-      <section className="max-w-5xl mx-auto mt-8 bg-white p-4 rounded shadow">
+      {/* Summary Table Section */}
+      <section className="max-w-5xl mx-auto bg-white p-4 rounded shadow">
         <h2 className="font-semibold mb-3">สรุป JSON ทั้งหมด</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">

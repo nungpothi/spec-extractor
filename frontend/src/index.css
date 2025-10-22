@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 /* Custom styles for specification preview */
+.preview-sections .p-4.space-y-4 {
+  padding: 0;
+  space-y: 1rem;
+}
+
+.preview-sections .p-4.space-y-4 > section {
+  margin-bottom: 1rem;
+}
+
 .markdown-body table {
   border-collapse: collapse;
   margin: 0;
@@ -66,4 +75,16 @@
 
 .preview-section:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive spacing for vertical layout */
+@media (max-width: 768px) {
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+/* Ensure sections stack properly */
+.preview-sections section {
+  width: 100%;
 }
