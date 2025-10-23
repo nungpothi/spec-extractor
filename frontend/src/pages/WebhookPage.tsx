@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from '../components';
 import { useAuthStore } from '../stores';
 import { webhookService } from '../services';
-import { WebhookLog } from '../types';
+import { WebhookItem, WebhookLog } from '../types';
 
 export const WebhookPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -10,6 +10,8 @@ export const WebhookPage: React.FC = () => {
   const [webhookLogs, setWebhookLogs] = useState<WebhookLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentWebhookId, setCurrentWebhookId] = useState<string>('');
+  const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
+  const [isLoadingList, setIsLoadingList] = useState(false);
 
   const generateWebhook = async () => {
     try {
@@ -20,6 +22,8 @@ export const WebhookPage: React.FC = () => {
         setWebhookUrl(result.url);
         setCurrentWebhookId(result.uuid);
         setWebhookLogs([]); // Clear previous logs
+        // Refresh list to include the new webhook
+        loadUserWebhooks();
       }
     } catch (error) {
       console.error('Failed to generate webhook:', error);
@@ -30,7 +34,7 @@ export const WebhookPage: React.FC = () => {
 
   const loadWebhookLogs = async () => {
     if (!currentWebhookId) return;
-    
+
     try {
       const response = await webhookService.getWebhookLogs(currentWebhookId);
       if (response.status) {
@@ -38,6 +42,20 @@ export const WebhookPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to load webhook logs:', error);
+    }
+  };
+
+  const loadUserWebhooks = async () => {
+    try {
+      setIsLoadingList(true);
+      const response = await webhookService.getUserWebhooks();
+      if (response.status) {
+        setWebhooks(response.results);
+      }
+    } catch (error) {
+      console.error('Failed to load user webhooks:', error);
+    } finally {
+      setIsLoadingList(false);
     }
   };
 
@@ -56,16 +74,20 @@ export const WebhookPage: React.FC = () => {
   useEffect(() => {
     if (currentWebhookId) {
       loadWebhookLogs();
-      // Auto-refresh logs every 5 seconds
-      const interval = setInterval(loadWebhookLogs, 5000);
-      return () => clearInterval(interval);
     }
   }, [currentWebhookId]);
+
+  useEffect(() => {
+    // Load user's existing webhooks when page mounts or user changes
+    if (user?.id) {
+      loadUserWebhooks();
+    }
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
       <Navbar className="mb-8" />
-      
+
       <main className="max-w-5xl mx-auto space-y-6">
         <section id="webhook-generator" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
           <h2 className="text-2xl font-semibold text-slate-700 mb-4">Webhook Endpoint</h2>
@@ -92,6 +114,63 @@ export const WebhookPage: React.FC = () => {
           </p>
         </section>
 
+        <section id="webhook-existing" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
+          <h2 className="text-2xl font-semibold text-slate-700 mb-4">My Webhooks</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead className="bg-slate-100 text-slate-700">
+                <tr>
+                  <th className="border p-2">#</th>
+                  <th className="border p-2">Webhook URL</th>
+                  <th className="border p-2">Created At</th>
+                  <th className="border p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="webhook-existing-body">
+                {isLoadingList ? (
+                  <tr>
+                    <td className="border p-2 text-center text-slate-500" colSpan={4}>Loading...</td>
+                  </tr>
+                ) : webhooks.length === 0 ? (
+                  <tr>
+                    <td className="border p-2 text-center text-slate-500" colSpan={4}>No webhooks yet. Generate one to get started.</td>
+                  </tr>
+                ) : (
+                  webhooks.map((wh, index) => (
+                    <tr key={wh.id} className="hover:bg-slate-50">
+                      <td className="border p-2">{index + 1}</td>
+                      <td className="border p-2 font-mono text-xs break-all">
+                        <button
+                          className="text-left w-full hover:underline text-sky-700"
+                          title="Copy URL"
+                          onClick={() => copyToClipboard(wh.url)}
+                        >
+                          {wh.url}
+                        </button>
+                      </td>
+                      <td className="border p-2">{new Date(wh.created_at).toLocaleString()}</td>
+                      <td className="border p-2">
+                        <button
+                          className="bg-sky-300 hover:bg-sky-400 text-white px-3 py-1 rounded shadow text-xs"
+                          onClick={() => {
+                            setCurrentWebhookId(wh.uuid_key);
+                            setWebhookUrl(wh.url);
+                            setWebhookLogs([]);
+                            // Load logs after selecting
+                            setTimeout(() => loadWebhookLogs(), 0);
+                          }}
+                        >
+                          View Logs
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <section id="webhook-log" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-semibold text-slate-700">Received Payloads</h2>
@@ -104,7 +183,7 @@ export const WebhookPage: React.FC = () => {
               </button>
             )}
           </div>
-          
+
           {webhookLogs.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
               {currentWebhookId ? 'No requests received yet. Send a POST request to your webhook URL.' : 'Generate a webhook URL to start receiving requests.'}

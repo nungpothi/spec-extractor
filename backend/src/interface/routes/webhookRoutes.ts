@@ -8,6 +8,9 @@ const webhookController = new WebhookController();
 // Generate a new webhook URL (requires authentication)
 router.post('/generate', authMiddleware, (req, res) => webhookController.generateWebhook(req, res));
 
+// List user's webhooks (requires authentication)
+router.get('/', authMiddleware, (req, res) => webhookController.listUserWebhooks(req, res));
+
 // Webhook endpoint - handle incoming requests (no auth required)
 router.all('/:uuid', (req, res) => webhookController.handleWebhookRequest(req, res));
 

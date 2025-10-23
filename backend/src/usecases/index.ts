@@ -4,3 +4,4 @@ export * from './preview';
 export * from './GenerateWebhookUsecase';
 export * from './LogWebhookRequestUsecase';
 export * from './GetWebhookLogsUsecase';
+export * from './GetUserWebhooksUsecase';

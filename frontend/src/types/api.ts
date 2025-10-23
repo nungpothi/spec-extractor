@@ -104,3 +104,10 @@ export interface WebhookLog {
   body: Record<string, any>;
   created_at: string;
 }
+
+export interface WebhookItem {
+  id: string;
+  uuid_key: string;
+  url: string;
+  created_at: string;
+}
