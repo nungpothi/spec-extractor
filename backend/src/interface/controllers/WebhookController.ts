@@ -10,7 +10,7 @@ export class WebhookController {
   constructor() {
     const webhookRepository = new TypeORMWebhookRepository();
     const webhookLogRepository = new TypeORMWebhookLogRepository();
-    
+
     this.generateWebhookUsecase = new GenerateWebhookUsecase(webhookRepository);
     this.logWebhookRequestUsecase = new LogWebhookRequestUsecase(webhookRepository, webhookLogRepository);
     this.getWebhookLogsUsecase = new GetWebhookLogsUsecase(webhookRepository, webhookLogRepository);
@@ -18,7 +18,7 @@ export class WebhookController {
 
   async generateWebhook(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).user?.id;
+      const userId = (req as any).user?.userId;
       if (!userId) {
         res.status(401).json({
           default: {
@@ -57,7 +57,7 @@ export class WebhookController {
 
   async handleWebhookRequest(req: Request, res: Response): Promise<void> {
     try {
-      const { uuid } = req.params;
+      const { uuid } = req.params as { uuid: string };
       const method = req.method;
       const headers = req.headers;
       const body = req.body || {};
@@ -87,9 +87,9 @@ export class WebhookController {
 
   async getWebhookLogs(req: Request, res: Response): Promise<void> {
     try {
-      const { uuid } = req.params;
-      const userId = (req as any).user?.id;
-      
+      const { uuid } = req.params as { uuid: string };
+      const userId = (req as any).user?.userId;
+
       if (!userId) {
         res.status(401).json({
           default: {
@@ -114,9 +114,9 @@ export class WebhookController {
       });
     } catch (error) {
       console.error('Get webhook logs error:', error);
-      const statusCode = error instanceof Error && error.message.includes('Unauthorized') ? 403 : 
+      const statusCode = error instanceof Error && error.message.includes('Unauthorized') ? 403 :
                         error instanceof Error && error.message.includes('not found') ? 404 : 500;
-      
+
       res.status(statusCode).json({
         default: {
           status: false,

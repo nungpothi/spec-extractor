@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { WebhookLog } from '../../domain/entities';
 import { WebhookLogRepository } from '../../domain/repositories';
-import { AppDataSource } from '../database';
+import { AppDataSource } from '../database/dataSource';
 import { WebhookLogEntity } from '../database/entities';
 
 export class TypeORMWebhookLogRepository implements WebhookLogRepository {
