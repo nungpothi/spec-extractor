@@ -42,4 +42,9 @@ export const webhookService = {
     });
     return response.data.default;
   },
+
+  async deleteWebhookLog(logId: string): Promise<{ status: boolean; results: any[]; message: string; errors: string[] }> {
+    const response = await api.delete<{ default: ApiResponse<any> }>(`/api/webhook/logs/${logId}`);
+    return response.data.default;
+  },
 };

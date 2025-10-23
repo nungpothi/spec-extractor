@@ -14,6 +14,8 @@ export const WebhookPage: React.FC = () => {
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [customResponse, setCustomResponse] = useState<string>('');
   const [isSavingResponse, setIsSavingResponse] = useState(false);
+  const [showJsonPopup, setShowJsonPopup] = useState(false);
+  const [jsonPopupContent, setJsonPopupContent] = useState<{ headers?: any; body?: any }>({});
 
   const generateWebhook = async () => {
     try {
@@ -79,6 +81,33 @@ export const WebhookPage: React.FC = () => {
     }
   };
 
+  const deleteWebhookLog = async (logId: string) => {
+    if (!confirm('Are you sure you want to delete this webhook log? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await webhookService.deleteWebhookLog(logId);
+      if (response.status) {
+        // Refresh logs after successful deletion
+        loadWebhookLogs();
+      }
+    } catch (error) {
+      console.error('Failed to delete webhook log:', error);
+      alert('Failed to delete webhook log. Please try again.');
+    }
+  };
+
+  const showJsonPreview = (headers: any, body: any) => {
+    setJsonPopupContent({ headers, body });
+    setShowJsonPopup(true);
+  };
+
+  const closeJsonPopup = () => {
+    setShowJsonPopup(false);
+    setJsonPopupContent({});
+  };
+
   const loadWebhookLogs = async () => {
     if (!currentWebhookId) return;
 
@@ -130,6 +159,20 @@ export const WebhookPage: React.FC = () => {
       loadUserWebhooks();
     }
   }, [user?.id]);
+
+  // Add ESC key listener for popup
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showJsonPopup) {
+        closeJsonPopup();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [showJsonPopup]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
@@ -290,8 +333,7 @@ export const WebhookPage: React.FC = () => {
                     <th className="border border-slate-200 p-2">#</th>
                     <th className="border border-slate-200 p-2">Timestamp</th>
                     <th className="border border-slate-200 p-2">Method</th>
-                    <th className="border border-slate-200 p-2">Headers</th>
-                    <th className="border border-slate-200 p-2">Body</th>
+                    <th className="border border-slate-200 p-2">Preview</th>
                     <th className="border border-slate-200 p-2">Actions</th>
                   </tr>
                 </thead>
@@ -313,35 +355,44 @@ export const WebhookPage: React.FC = () => {
                       </td>
                       <td className="border border-slate-200 p-2 max-w-xs">
                         <div className="overflow-hidden">
-                          <pre className="text-xs whitespace-pre-wrap break-all">
-                            {formatJson(log.headers).substring(0, 100)}
-                            {formatJson(log.headers).length > 100 && '...'}
-                          </pre>
-                        </div>
-                      </td>
-                      <td className="border border-slate-200 p-2 max-w-xs">
-                        <div className="overflow-hidden">
-                          <pre className="text-xs whitespace-pre-wrap break-all">
-                            {formatJson(log.body).substring(0, 100)}
-                            {formatJson(log.body).length > 100 && '...'}
-                          </pre>
+                          <div className="text-xs text-slate-600 mb-1">
+                            <strong>Headers:</strong> {Object.keys(log.headers || {}).length} keys
+                          </div>
+                          <div className="text-xs text-slate-600">
+                            <strong>Body:</strong> {formatJson(log.body).substring(0, 50)}
+                            {formatJson(log.body).length > 50 && '...'}
+                          </div>
                         </div>
                       </td>
                       <td className="border border-slate-200 p-2">
                         <div className="flex space-x-1">
                           <button
-                            onClick={() => copyToClipboard(formatJson(log.headers))}
+                            onClick={() => showJsonPreview(log.headers, log.body)}
                             className="text-xs bg-blue-200 hover:bg-blue-300 text-blue-800 px-2 py-1 rounded"
+                            title="Preview JSON"
+                          >
+                            Preview
+                          </button>
+                          <button
+                            onClick={() => copyToClipboard(formatJson(log.headers))}
+                            className="text-xs bg-green-200 hover:bg-green-300 text-green-800 px-2 py-1 rounded"
                             title="Copy Headers"
                           >
                             H
                           </button>
                           <button
                             onClick={() => copyToClipboard(formatJson(log.body))}
-                            className="text-xs bg-green-200 hover:bg-green-300 text-green-800 px-2 py-1 rounded"
+                            className="text-xs bg-purple-200 hover:bg-purple-300 text-purple-800 px-2 py-1 rounded"
                             title="Copy Body"
                           >
                             B
+                          </button>
+                          <button
+                            onClick={() => deleteWebhookLog(log.id)}
+                            className="text-xs bg-red-200 hover:bg-red-300 text-red-800 px-2 py-1 rounded"
+                            title="Delete Log"
+                          >
+                            Del
                           </button>
                         </div>
                       </td>
@@ -353,6 +404,62 @@ export const WebhookPage: React.FC = () => {
           )}
         </section>
       </main>
+
+      {/* JSON Preview Popup */}
+      {showJsonPopup && (
+        <div 
+          id="json-popup" 
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50"
+          onClick={closeJsonPopup}
+        >
+          <div 
+            className="bg-white p-6 rounded-2xl shadow-lg w-3/4 max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-slate-700 mb-3">JSON Preview</h3>
+            
+            {jsonPopupContent.headers && (
+              <div className="mb-4">
+                <h4 className="text-lg font-medium text-slate-600 mb-2">Headers:</h4>
+                <pre 
+                  id="json-preview-headers" 
+                  className="text-sm bg-gray-50 border border-slate-200 p-3 rounded overflow-auto max-h-40"
+                >
+                  {formatJson(jsonPopupContent.headers)}
+                </pre>
+              </div>
+            )}
+            
+            {jsonPopupContent.body && (
+              <div className="mb-4">
+                <h4 className="text-lg font-medium text-slate-600 mb-2">Body:</h4>
+                <pre 
+                  id="json-preview-body" 
+                  className="text-sm bg-gray-50 border border-slate-200 p-3 rounded overflow-auto max-h-60"
+                >
+                  {formatJson(jsonPopupContent.body)}
+                </pre>
+              </div>
+            )}
+            
+            <div className="flex justify-end mt-4 space-x-2">
+              <button
+                onClick={() => copyToClipboard(formatJson(jsonPopupContent))}
+                className="bg-emerald-300 hover:bg-emerald-400 text-slate-700 px-4 py-2 rounded"
+              >
+                Copy All
+              </button>
+              <button 
+                id="btn-close-popup"
+                onClick={closeJsonPopup}
+                className="bg-sky-300 hover:bg-sky-400 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

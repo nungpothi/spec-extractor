@@ -24,6 +24,15 @@ export class TypeORMWebhookRepository implements WebhookRepository {
     return this.toDomainEntity(savedEntity);
   }
 
+  async findById(id: string): Promise<Webhook | null> {
+    const webhookEntity = await this.repository.findOne({
+      where: { id },
+      relations: ['user']
+    });
+
+    return webhookEntity ? this.toDomainEntity(webhookEntity) : null;
+  }
+
   async findByUuid(uuid: string): Promise<Webhook | null> {
     const webhookEntity = await this.repository.findOne({
       where: { uuid_key: uuid },

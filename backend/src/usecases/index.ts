@@ -6,3 +6,4 @@ export * from './LogWebhookRequestUsecase';
 export * from './GetWebhookLogsUsecase';
 export * from './GetUserWebhooksUsecase';
 export * from './UpdateWebhookResponseUsecase';
+export * from './DeleteWebhookLogUsecase';

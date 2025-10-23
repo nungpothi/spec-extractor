@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GenerateWebhookUsecase, LogWebhookRequestUsecase, GetWebhookLogsUsecase, GetUserWebhooksUsecase, UpdateWebhookResponseUsecase } from '../../usecases';
+import { GenerateWebhookUsecase, LogWebhookRequestUsecase, GetWebhookLogsUsecase, GetUserWebhooksUsecase, UpdateWebhookResponseUsecase, DeleteWebhookLogUsecase } from '../../usecases';
 import { TypeORMWebhookRepository, TypeORMWebhookLogRepository } from '../../infrastructure/repositories';
 
 export class WebhookController {
@@ -8,6 +8,7 @@ export class WebhookController {
   private getWebhookLogsUsecase: GetWebhookLogsUsecase;
   private getUserWebhooksUsecase: GetUserWebhooksUsecase;
   private updateWebhookResponseUsecase: UpdateWebhookResponseUsecase;
+  private deleteWebhookLogUsecase: DeleteWebhookLogUsecase;
 
   constructor() {
     const webhookRepository = new TypeORMWebhookRepository();
@@ -18,6 +19,7 @@ export class WebhookController {
     this.getWebhookLogsUsecase = new GetWebhookLogsUsecase(webhookRepository, webhookLogRepository);
     this.getUserWebhooksUsecase = new GetUserWebhooksUsecase(webhookRepository);
     this.updateWebhookResponseUsecase = new UpdateWebhookResponseUsecase(webhookRepository);
+    this.deleteWebhookLogUsecase = new DeleteWebhookLogUsecase(webhookRepository, webhookLogRepository);
   }
 
   async generateWebhook(req: Request, res: Response): Promise<void> {
@@ -214,6 +216,49 @@ export class WebhookController {
         default: {
           status: false,
           message: 'Error updating webhook response',
+          results: [],
+          errors: [error instanceof Error ? error.message : 'Unknown error']
+        }
+      });
+    }
+  }
+
+  async deleteWebhookLog(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params as { id: string };
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        res.status(401).json({
+          default: {
+            status: false,
+            message: 'Unauthorized',
+            results: [],
+            errors: ['User not authenticated']
+          }
+        });
+        return;
+      }
+
+      await this.deleteWebhookLogUsecase.execute(id, userId);
+
+      res.status(200).json({
+        default: {
+          status: true,
+          message: 'deleted',
+          results: [],
+          errors: []
+        }
+      });
+    } catch (error) {
+      console.error('Delete webhook log error:', error);
+      const statusCode = error instanceof Error && error.message.includes('Unauthorized') ? 403 :
+                        error instanceof Error && error.message.includes('not found') ? 404 : 500;
+
+      res.status(statusCode).json({
+        default: {
+          status: false,
+          message: 'Error deleting webhook log',
           results: [],
           errors: [error instanceof Error ? error.message : 'Unknown error']
         }

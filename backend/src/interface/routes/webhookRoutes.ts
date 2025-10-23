@@ -14,10 +14,13 @@ router.get('/', authMiddleware, (req, res) => webhookController.listUserWebhooks
 // Update webhook response template (requires authentication and ownership)
 router.put('/:uuid/response', authMiddleware, (req, res) => webhookController.updateWebhookResponse(req, res));
 
-// Webhook endpoint - handle incoming requests (no auth required)
-router.all('/:uuid', (req, res) => webhookController.handleWebhookRequest(req, res));
-
 // Get webhook logs (requires authentication and ownership)
 router.get('/:uuid/logs', authMiddleware, (req, res) => webhookController.getWebhookLogs(req, res));
+
+// Delete specific webhook log (requires authentication and ownership)
+router.delete('/logs/:id', authMiddleware, (req, res) => webhookController.deleteWebhookLog(req, res));
+
+// Webhook endpoint - handle incoming requests (no auth required)
+router.all('/:uuid', (req, res) => webhookController.handleWebhookRequest(req, res));
 
 export { router as webhookRoutes };
