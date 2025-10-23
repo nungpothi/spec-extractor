@@ -11,6 +11,9 @@ router.post('/generate', authMiddleware, (req, res) => webhookController.generat
 // List user's webhooks (requires authentication)
 router.get('/', authMiddleware, (req, res) => webhookController.listUserWebhooks(req, res));
 
+// Update webhook response template (requires authentication and ownership)
+router.put('/:uuid/response', authMiddleware, (req, res) => webhookController.updateWebhookResponse(req, res));
+
 // Webhook endpoint - handle incoming requests (no auth required)
 router.all('/:uuid', (req, res) => webhookController.handleWebhookRequest(req, res));
 

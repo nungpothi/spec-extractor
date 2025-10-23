@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS webhooks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     uuid_key UUID UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,
+    response_template JSONB NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
@@ -157,6 +158,7 @@ CREATE TRIGGER update_webhooks_updated_at BEFORE UPDATE ON webhooks
 COMMENT ON TABLE webhooks IS 'User-generated webhook endpoints for receiving HTTP requests';
 COMMENT ON COLUMN webhooks.uuid_key IS 'Unique UUID used in webhook URL for public access';
 COMMENT ON COLUMN webhooks.user_id IS 'User who owns this webhook';
+COMMENT ON COLUMN webhooks.response_template IS 'Custom JSON response template to return when webhook is triggered';
 
 COMMENT ON TABLE webhook_logs IS 'Log of all HTTP requests received by webhook endpoints';
 COMMENT ON COLUMN webhook_logs.webhook_id IS 'Reference to the webhook that received this request';

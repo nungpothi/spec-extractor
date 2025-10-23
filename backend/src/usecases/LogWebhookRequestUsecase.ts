@@ -12,7 +12,7 @@ export class LogWebhookRequestUsecase {
     method: string,
     headers: Record<string, any>,
     body: Record<string, any>
-  ): Promise<void> {
+  ): Promise<object> {
     // Find the webhook by UUID
     const webhook = await this.webhookRepository.findByUuid(webhookUuid);
     if (!webhook) {
@@ -23,5 +23,8 @@ export class LogWebhookRequestUsecase {
     const webhookLog = new WebhookLog(webhook.id, method.toUpperCase(), headers, body);
     
     await this.webhookLogRepository.create(webhookLog);
+
+    // Return the custom response template or default response
+    return webhook.getResponseTemplate();
   }
 }

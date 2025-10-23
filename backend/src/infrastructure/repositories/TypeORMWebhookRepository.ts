@@ -15,6 +15,7 @@ export class TypeORMWebhookRepository implements WebhookRepository {
     const webhookEntity = this.repository.create({
       uuid_key: webhook.uuid_key,
       user_id: webhook.user_id,
+      response_template: webhook.response_template,
       created_by: webhook.created_by,
       updated_by: webhook.updated_by,
     });
@@ -53,6 +54,7 @@ export class TypeORMWebhookRepository implements WebhookRepository {
     const updatedEntity = Object.assign(webhookEntity, {
       uuid_key: webhook.uuid_key,
       user_id: webhook.user_id,
+      response_template: webhook.response_template,
       updated_by: webhook.updated_by,
     });
 
@@ -65,7 +67,7 @@ export class TypeORMWebhookRepository implements WebhookRepository {
   }
 
   private toDomainEntity(entity: WebhookEntity): Webhook {
-    const webhook = new Webhook(entity.uuid_key, entity.user_id);
+    const webhook = new Webhook(entity.uuid_key, entity.user_id, entity.response_template);
     webhook.id = entity.id;
     webhook.created_at = entity.created_at;
     webhook.updated_at = entity.updated_at;

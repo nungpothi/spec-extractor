@@ -13,6 +13,9 @@ export class WebhookEntity {
   @Column({ type: 'uuid' })
   user_id!: string;
 
+  @Column({ type: 'jsonb', nullable: true })
+  response_template?: object;
+
   @CreateDateColumn()
   created_at!: Date;
 

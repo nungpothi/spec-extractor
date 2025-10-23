@@ -95,6 +95,7 @@ export type RequirementStatus = 'NEW' | 'IN_PROGRESS' | 'DONE';
 export interface GenerateWebhookResponse {
   uuid: string;
   url: string;
+  response_template?: object | null;
 }
 
 export interface WebhookLog {
@@ -109,5 +110,6 @@ export interface WebhookItem {
   id: string;
   uuid_key: string;
   url: string;
+  response_template?: object | null;
   created_at: string;
 }

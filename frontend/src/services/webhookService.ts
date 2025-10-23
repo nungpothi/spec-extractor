@@ -20,8 +20,9 @@ api.interceptors.request.use((config) => {
 });
 
 export const webhookService = {
-  async generateWebhook(): Promise<{ status: boolean; results: GenerateWebhookResponse[]; message: string; errors: string[] }> {
-    const response = await api.post<{ default: ApiResponse<GenerateWebhookResponse> }>('/api/webhook/generate');
+  async generateWebhook(responseTemplate?: object): Promise<{ status: boolean; results: GenerateWebhookResponse[]; message: string; errors: string[] }> {
+    const payload = responseTemplate ? { response_template: responseTemplate } : {};
+    const response = await api.post<{ default: ApiResponse<GenerateWebhookResponse> }>('/api/webhook/generate', payload);
     return response.data.default;
   },
 
@@ -32,6 +33,13 @@ export const webhookService = {
 
   async getWebhookLogs(webhookId: string): Promise<{ status: boolean; results: WebhookLog[]; message: string; errors: string[] }> {
     const response = await api.get<{ default: ApiResponse<WebhookLog> }>(`/api/webhook/${webhookId}/logs`);
+    return response.data.default;
+  },
+
+  async updateWebhookResponse(webhookId: string, responseTemplate: object): Promise<{ status: boolean; results: { uuid: string }[]; message: string; errors: string[] }> {
+    const response = await api.put<{ default: ApiResponse<{ uuid: string }> }>(`/api/webhook/${webhookId}/response`, {
+      response_template: responseTemplate
+    });
     return response.data.default;
   },
 };

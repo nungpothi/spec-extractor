@@ -12,11 +12,25 @@ export const WebhookPage: React.FC = () => {
   const [currentWebhookId, setCurrentWebhookId] = useState<string>('');
   const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
+  const [customResponse, setCustomResponse] = useState<string>('');
+  const [isSavingResponse, setIsSavingResponse] = useState(false);
 
   const generateWebhook = async () => {
     try {
       setIsLoading(true);
-      const response = await webhookService.generateWebhook();
+      let responseTemplate: object | undefined;
+
+      // Parse custom response if provided
+      if (customResponse.trim()) {
+        try {
+          responseTemplate = JSON.parse(customResponse);
+        } catch (error) {
+          alert('Invalid JSON format in custom response. Please check your JSON syntax.');
+          return;
+        }
+      }
+
+      const response = await webhookService.generateWebhook(responseTemplate);
       if (response.status) {
         const result = response.results[0];
         setWebhookUrl(result.url);
@@ -29,6 +43,39 @@ export const WebhookPage: React.FC = () => {
       console.error('Failed to generate webhook:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const saveCustomResponse = async () => {
+    if (!currentWebhookId) {
+      alert('Please select a webhook first');
+      return;
+    }
+
+    if (!customResponse.trim()) {
+      alert('Please enter a custom response');
+      return;
+    }
+
+    try {
+      setIsSavingResponse(true);
+      const responseTemplate = JSON.parse(customResponse);
+      const response = await webhookService.updateWebhookResponse(currentWebhookId, responseTemplate);
+      
+      if (response.status) {
+        alert('Custom response saved successfully!');
+        // Refresh the webhook list to show updated response
+        loadUserWebhooks();
+      }
+    } catch (error: any) {
+      if (error.name === 'SyntaxError') {
+        alert('Invalid JSON format. Please check your JSON syntax.');
+      } else {
+        console.error('Failed to save custom response:', error);
+        alert('Failed to save custom response. Please try again.');
+      }
+    } finally {
+      setIsSavingResponse(false);
     }
   };
 
@@ -112,6 +159,27 @@ export const WebhookPage: React.FC = () => {
           <p className="text-slate-500 text-sm mt-2">
             Use this unique URL to send test POST requests and inspect payloads. Click the URL to copy.
           </p>
+          
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-slate-700 mb-2">Custom Response</h3>
+            <textarea
+              id="webhook-response"
+              className="w-full h-40 p-3 border border-slate-200 rounded-lg bg-white/70 font-mono text-slate-700 placeholder-slate-400"
+              placeholder="Enter JSON response to return when this webhook is called"
+              value={customResponse}
+              onChange={(e) => setCustomResponse(e.target.value)}
+            />
+            <div className="flex justify-end mt-3">
+              <button
+                id="btn-save-response"
+                onClick={saveCustomResponse}
+                disabled={isSavingResponse || !currentWebhookId}
+                className="bg-emerald-300 hover:bg-emerald-400 disabled:bg-slate-300 text-slate-700 px-6 py-2 rounded shadow transition-colors"
+              >
+                {isSavingResponse ? 'Saving...' : 'Save Response'}
+              </button>
+            </div>
+          </div>
         </section>
 
         <section id="webhook-existing" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
@@ -122,6 +190,7 @@ export const WebhookPage: React.FC = () => {
                 <tr>
                   <th className="border p-2">#</th>
                   <th className="border p-2">Webhook URL</th>
+                  <th className="border p-2">Custom Response</th>
                   <th className="border p-2">Created At</th>
                   <th className="border p-2">Actions</th>
                 </tr>
@@ -129,11 +198,11 @@ export const WebhookPage: React.FC = () => {
               <tbody id="webhook-existing-body">
                 {isLoadingList ? (
                   <tr>
-                    <td className="border p-2 text-center text-slate-500" colSpan={4}>Loading...</td>
+                    <td className="border p-2 text-center text-slate-500" colSpan={5}>Loading...</td>
                   </tr>
                 ) : webhooks.length === 0 ? (
                   <tr>
-                    <td className="border p-2 text-center text-slate-500" colSpan={4}>No webhooks yet. Generate one to get started.</td>
+                    <td className="border p-2 text-center text-slate-500" colSpan={5}>No webhooks yet. Generate one to get started.</td>
                   </tr>
                 ) : (
                   webhooks.map((wh, index) => (
@@ -148,20 +217,45 @@ export const WebhookPage: React.FC = () => {
                           {wh.url}
                         </button>
                       </td>
+                      <td className="border p-2 max-w-xs">
+                        <div className="overflow-hidden">
+                          {wh.response_template ? (
+                            <pre className="text-xs whitespace-pre-wrap break-all">
+                              {formatJson(wh.response_template).substring(0, 100)}
+                              {formatJson(wh.response_template).length > 100 && '...'}
+                            </pre>
+                          ) : (
+                            <span className="text-slate-400 text-xs">Default response</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="border p-2">{new Date(wh.created_at).toLocaleString()}</td>
                       <td className="border p-2">
-                        <button
-                          className="bg-sky-300 hover:bg-sky-400 text-white px-3 py-1 rounded shadow text-xs"
-                          onClick={() => {
-                            setCurrentWebhookId(wh.uuid_key);
-                            setWebhookUrl(wh.url);
-                            setWebhookLogs([]);
-                            // Load logs after selecting
-                            setTimeout(() => loadWebhookLogs(), 0);
-                          }}
-                        >
-                          View Logs
-                        </button>
+                        <div className="flex space-x-1">
+                          <button
+                            className="bg-sky-300 hover:bg-sky-400 text-white px-3 py-1 rounded shadow text-xs"
+                            onClick={() => {
+                              setCurrentWebhookId(wh.uuid_key);
+                              setWebhookUrl(wh.url);
+                              setWebhookLogs([]);
+                              // Load existing response template into textarea
+                              setCustomResponse(wh.response_template ? formatJson(wh.response_template) : '');
+                              // Load logs after selecting
+                              setTimeout(() => loadWebhookLogs(), 0);
+                            }}
+                          >
+                            View Logs
+                          </button>
+                          {wh.response_template && (
+                            <button
+                              onClick={() => copyToClipboard(formatJson(wh.response_template))}
+                              className="text-xs bg-emerald-200 hover:bg-emerald-300 text-emerald-800 px-2 py-1 rounded"
+                              title="Copy Custom Response"
+                            >
+                              CR
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
