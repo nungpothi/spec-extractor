@@ -1,55 +1,56 @@
-version: '3.8'
+version: "3.9"
 
 services:
+  app:
+    image: ${DOCKER_IMAGE:-registry.gitlab.com/ex/spec-extractor/app:latest}
+    container_name: spec-extractor-app
+    restart: always
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: ${APP_PORT:-8000}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_DATABASE: ${DB_DATABASE:-json_preview_db}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      - postgres
+    networks:
+      - default
+      - internal
+
   postgres:
     image: postgres:15-alpine
-    container_name: json-preview-db
+    container_name: spec-extractor-db
+    restart: always
     environment:
-      POSTGRES_DB: json_preview_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${DB_DATABASE:-json_preview_db}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database_schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 30s
       timeout: 10s
       retries: 5
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: json-preview-backend
-    environment:
-      NODE_ENV: production
-      PORT: 8000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_DATABASE: json_preview_db
-      CORS_ORIGIN: http://localhost:3000
-    ports:
-      - "8000:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: json-preview-frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    restart: unless-stopped
+    networks:
+      - internal
 
 volumes:
   postgres_data:
+
+networks:
+  default:
+    external:
+      name: webproxy
+  internal:
+    driver: bridge
