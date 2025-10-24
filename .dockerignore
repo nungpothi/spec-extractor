@@ -1,0 +1,62 @@
+# Self-Service Kiosk - Docker Ignore
+# Prevent unnecessary files from being sent to Docker build context
+
+# Development files
+.git/
+.gitignore
+README.md
+.env.local
+.env.example
+
+# Node modules and build cache
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/.npmrc
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage and test files
+coverage/
+.nyc_output/
+*.lcov
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Docker files (not needed in build context)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Deployment files
+Makefile
+deploy/
+scripts/
+
+# Documentation
+docs/
+*.md
+!frontend/README.md

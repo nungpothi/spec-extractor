@@ -1,0 +1,67 @@
+version: '3.8'
+
+networks:
+  kiosk-network:
+    driver: bridge
+
+services:
+  kiosk-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://spec-extractor-app-api.givemebug.online/api}
+    container_name: self-service-kiosk
+    restart: always
+    
+    ports:
+      - "80:80"
+    
+    environment:
+      - DOMAIN=${DOMAIN:-self-service-kiosk.givemebug.online}
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://spec-extractor-app-api.givemebug.online/api}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST:-self-service-kiosk.givemebug.online}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-nungpothi.p@gmail.com}
+      - VIRTUAL_HOST=${VIRTUAL_HOST:-self-service-kiosk.givemebug.online}
+      - VIRTUAL_PORT=${VIRTUAL_PORT:-80}
+    
+    networks:
+      - kiosk-network
+    
+    volumes:
+      # Mount custom nginx config if needed
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kiosk.rule=Host(`${DOMAIN:-self-service-kiosk.givemebug.online}`)"
+      - "traefik.http.routers.kiosk.entrypoints=websecure"
+      - "traefik.http.routers.kiosk.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kiosk.loadbalancer.server.port=80"
+      # nginx-proxy labels for alternative reverse proxy setup
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.5'
+        reservations:
+          memory: 64M
+          cpus: '0.25'

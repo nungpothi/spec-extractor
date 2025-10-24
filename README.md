@@ -2,6 +2,8 @@
 
 A UI prototype for self-service kiosk check-in using React 18, TypeScript, Zustand, and React Router DOM v6 with beautiful pastel minimal design.
 
+🌐 **Live Demo**: https://self-service-kiosk.givemebug.online
+
 ## Features
 
 - **Pastel Design**: Soft gradient backgrounds and gentle color palette
@@ -9,6 +11,22 @@ A UI prototype for self-service kiosk check-in using React 18, TypeScript, Zusta
 - **Registration Flow**: New appointment booking with elegant form design
 - **Queue Management**: Beautiful ticket printing interface with pastel styling
 - **Mock API**: Uses static JSON responses for rapid prototyping
+- **Production Ready**: Complete Docker deployment setup
+
+## 🚀 Quick Deployment
+
+```bash
+# Build and deploy
+make build push deploy
+
+# Check status
+make status
+
+# View logs
+make logs
+```
+
+**Result**: https://self-service-kiosk.givemebug.online
 
 ## Design Highlights
 
@@ -36,16 +54,16 @@ Accent Links: #7bb8a8
 ## Project Structure
 
 ```
-frontend/
-├── src/
-│   ├── pages/
-│   │   ├── WelcomePage.tsx         # Combined welcome + check-in
-│   │   ├── RegisterPage.tsx        # User registration form
-│   │   ├── AppointmentPage.tsx     # Date/time selection
-│   │   ├── ConfirmationPage.tsx    # Appointment details
-│   │   └── PrintPage.tsx           # Queue ticket printing
-│   ├── App.css                     # Pastel-themed global styles
-│   └── ...
+├── 📁 frontend/                    # React application
+│   ├── src/pages/                 # UI components
+│   ├── package.json               # Dependencies
+│   └── dist/                      # Built output
+├── 🐳 Dockerfile                  # Multi-stage build
+├── 🔧 docker-compose.yml          # Container orchestration
+├── ⚙️ Makefile                    # Deployment automation
+├── 🌐 nginx.conf                  # Production web server
+├── 📋 .env                        # Environment config
+└── 📚 DEPLOYMENT.md               # Deployment guide
 ```
 
 ## Getting Started
@@ -53,39 +71,54 @@ frontend/
 ### Prerequisites
 
 - Node.js 18 or higher
-- npm or yarn
+- Docker & Docker Compose (for deployment)
+- Make (for automation)
 
-### Installation
+### Development
 
-1. Navigate to the frontend directory:
+1. **Local Development**:
    ```bash
    cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
    npm install
-   ```
-
-3. Start the development server:
-   ```bash
    npm run dev
    ```
 
-4. Open your browser and navigate to the displayed URL
+2. **Local Build Test**:
+   ```bash
+   cd frontend
+   npm run build
+   ```
 
-### Building for Production
+### Production Deployment
 
-```bash
-npm run build
-```
+1. **Quick Deploy**:
+   ```bash
+   make pipeline  # build → push → deploy
+   ```
 
-### Docker Deployment
+2. **Step by Step**:
+   ```bash
+   make build     # Build Docker image
+   make push      # Push to registry  
+   make deploy    # Deploy container
+   ```
 
-```bash
-docker build -t self-service-kiosk .
-docker run -p 80:80 self-service-kiosk
-```
+3. **Monitor**:
+   ```bash
+   make status    # Check container status
+   make logs      # View real-time logs
+   ```
+
+## API Endpoints (Mock Webhooks)
+
+The application uses mock services that simulate these API endpoints:
+
+| Endpoint | Method | Purpose | Status |
+|----------|--------|---------|---------|
+| `/api/checkin` | GET | Check-in existing appointment | ✅ Mock |
+| `/api/register` | POST | Register new appointment | ✅ Mock |
+| `/api/available-slots` | GET | Get available time slots | ✅ Mock |
+| `/api/print-queue` | POST | Print queue ticket | ✅ Mock |
 
 ## UI Flow
 
@@ -112,17 +145,68 @@ For testing purposes, use:
 - **Routing**: React Router DOM v6
 - **Build Tool**: Vite
 - **Styling**: Pastel-themed CSS3 with responsive design
-- **Container**: Docker with nginx
+- **Deployment**: Docker + Nginx Alpine
+- **Automation**: Makefile + GitLab CI/CD
 
-## Pastel Design Elements
+## Deployment Architecture
 
-- **Soft Gradients**: Multiple gradient combinations for visual interest
-- **Gentle Shadows**: Subtle depth without harsh contrasts
-- **Rounded Corners**: 14px for inputs/buttons, 16-24px for cards
-- **Color Harmony**: Coordinated pastel palette throughout
-- **Smooth Transitions**: 0.2s ease animations
-- **Typography Balance**: 600 weight titles, 500 weight secondary text
-- **Touch-Friendly**: Optimized for kiosk and tablet interfaces
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React App     │───▶│  Docker Build   │───▶│  Nginx Alpine   │
+│ (Vite + TS)     │    │   (Multi-stage) │    │   (Production)  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                       │
+                                               ┌─────────────────┐
+                                               │     Domain      │
+                                               │  SSL + Proxy   │
+                                               └─────────────────┘
+```
+
+## Container Features
+
+- 🏥 **Health Checks**: Automated monitoring every 30s
+- 📊 **Resource Limits**: 128MB RAM, 0.5 CPU max
+- 🔄 **Auto-restart**: Always restart on failure
+- 📝 **Logging**: JSON format with 10MB rotation
+- 🛡️ **Security**: HTTP security headers via Nginx
+- ⚡ **Performance**: Gzip compression, static caching
+
+## Environment Configuration
+
+```bash
+# .env
+DOMAIN=self-service-kiosk.givemebug.online
+VITE_API_BASE_URL=http://spec-extractor-app-api.givemebug.online/api
+REGISTRY=registry.gitlab.com/givemebug/self-service-kiosk
+```
+
+## Deployment Commands
+
+| Command | Description |
+|---------|-------------|
+| `make build` | Build Docker image locally |
+| `make push` | Push to GitLab registry |
+| `make deploy` | Deploy/restart container |
+| `make logs` | View real-time logs |
+| `make status` | Check container health |
+| `make pipeline` | Full build→push→deploy |
+| `make clean` | Remove containers/images |
+
+## Monitoring & Health
+
+```bash
+# Health check
+curl https://self-service-kiosk.givemebug.online/health
+
+# Container status
+make status
+
+# Application logs
+make logs
+
+# Resource usage
+docker stats self-service-kiosk
+```
 
 ## Development Notes
 
@@ -131,3 +215,10 @@ For testing purposes, use:
 - Error and success messages with themed styling
 - TypeScript for enhanced developer experience
 - Build optimization: ~6KB CSS, ~178KB JS
+- Production-ready Docker setup with health checks
+
+---
+
+🎉 **Live Application**: https://self-service-kiosk.givemebug.online  
+📚 **Deployment Guide**: [DEPLOYMENT.md](DEPLOYMENT.md)  
+🐳 **Container Registry**: registry.gitlab.com/givemebug/self-service-kiosk
