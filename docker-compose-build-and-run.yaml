@@ -46,7 +46,10 @@ services:
       LETSENCRYPT_HOST: ${FRONTEND_LETSENCRYPT_HOST}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       VIRTUAL_HOST: ${FRONTEND_LETSENCRYPT_HOST}
-      BACKEND_URL: http://backend:8000
+      BACKEND_URL: https://${BACKEND_LETSENCRYPT_HOST}
+      VIRTUAL_PORT: 3000
+    expose:
+      - "3000"
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
