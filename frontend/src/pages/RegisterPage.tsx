@@ -80,7 +80,7 @@ const RegisterPage: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="nationalId" className="form-label">
-              National ID (13 digits)
+              National ID
             </label>
             <input
               type="text"
@@ -110,7 +110,7 @@ const RegisterPage: React.FC = () => {
           </div>
 
           <div className="button-group">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary btn-full">
               Continue
             </button>
             <button 

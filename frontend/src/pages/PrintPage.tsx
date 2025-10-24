@@ -93,35 +93,41 @@ const PrintPage: React.FC = () => {
               <h3>🎫 Your Queue Ticket</h3>
               <div style={{ 
                 textAlign: 'center', 
-                padding: '20px',
+                padding: '24px',
                 backgroundColor: 'white',
-                border: '2px dashed #ddd',
-                borderRadius: '8px',
-                margin: '20px 0'
+                border: '2px dashed #c8e6c9',
+                borderRadius: '16px',
+                margin: '20px 0',
+                background: 'linear-gradient(135deg, #fdfbfb 0%, #f9fafb 100%)'
               }}>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#007bff' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#7bb8a8', marginBottom: '8px' }}>
                   {queueNo}
                 </div>
-                <div style={{ marginTop: '10px', color: '#666' }}>
+                <div style={{ marginBottom: '16px', color: '#7b7b7b', fontSize: '0.9rem', fontWeight: '500' }}>
                   Queue Number
                 </div>
-                <div style={{ marginTop: '15px', fontSize: '0.9rem', color: '#333' }}>
-                  Date: {data && new Date(data.appointment_date).toLocaleDateString()}
+                <div style={{ fontSize: '0.9rem', color: '#3c3c3c', marginBottom: '4px' }}>
+                  {data && new Date(data.appointment_date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </div>
-                <div style={{ fontSize: '0.9rem', color: '#333' }}>
-                  Time: {data?.appointment_time}
+                <div style={{ fontSize: '0.9rem', color: '#3c3c3c', fontWeight: '500' }}>
+                  {data?.appointment_time}
                 </div>
               </div>
             </div>
 
             <div style={{ 
-              background: '#e8f5e8', 
-              padding: '15px', 
-              borderRadius: '8px', 
+              background: 'linear-gradient(90deg, #e8f5e8 0%, #d4f1d4 100%)', 
+              padding: '16px', 
+              borderRadius: '14px', 
               marginBottom: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
+              border: '1px solid #c8e6c9'
             }}>
-              <p style={{ margin: 0, color: '#2d5e2d', fontWeight: '600' }}>
+              <p style={{ margin: 0, color: '#2d5e2d', fontWeight: '500', fontSize: '0.95rem' }}>
                 ✅ Please take your printed ticket and wait for your number to be called.
               </p>
             </div>
@@ -154,7 +160,7 @@ const PrintPage: React.FC = () => {
             </button>
           )}
           <button 
-            className="btn btn-success"
+            className="btn btn-success btn-full"
             onClick={handleFinish}
             disabled={loading && printStatus === 'printing'}
           >

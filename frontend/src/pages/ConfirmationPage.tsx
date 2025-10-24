@@ -87,19 +87,20 @@ const ConfirmationPage: React.FC = () => {
         </div>
 
         <div style={{ 
-          background: '#e3f2fd', 
-          padding: '15px', 
-          borderRadius: '8px', 
-          marginBottom: '20px' 
+          background: 'linear-gradient(135deg, #f0fffe 0%, #e8f9f8 100%)', 
+          padding: '16px', 
+          borderRadius: '14px', 
+          marginBottom: '20px',
+          border: '1px solid #c8e6c9'
         }}>
-          <p style={{ margin: 0, color: '#1565c0', fontWeight: '600' }}>
+          <p style={{ margin: 0, color: '#2d5e2d', fontWeight: '500', fontSize: '0.95rem' }}>
             📋 Please print your queue ticket and wait for your number to be called.
           </p>
         </div>
 
         <div className="button-group">
           <button 
-            className="btn btn-success"
+            className="btn btn-success btn-full"
             onClick={handlePrintQueue}
           >
             Print Queue Ticket

@@ -161,7 +161,7 @@ const AppointmentPage: React.FC = () => {
 
             <div className="button-group">
               <button 
-                className="btn btn-primary"
+                className="btn btn-primary btn-full"
                 onClick={handleSubmit}
                 disabled={loading || !selectedDate || !selectedTime}
               >
