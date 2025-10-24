@@ -4,6 +4,7 @@ import { TemplateForm } from '@/components/TemplateForm';
 import { TemplateTable } from '@/components/TemplateTable';
 import { Alert } from '@/components/Alert';
 import { DarkModeToggle } from '@/components/DarkModeToggle';
+import { Navigation } from '@/components/Navigation';
 import { CreateTemplateRequest } from '@/types/template';
 
 export const TemplateManagementPage: React.FC = () => {
@@ -53,9 +54,12 @@ export const TemplateManagementPage: React.FC = () => {
 
   return (
     <div className="min-h-screen transition-colors duration-500 bg-pastel-light dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {/* Navigation */}
+      <Navigation />
+
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 gap-4">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 gap-4 max-w-7xl mx-auto">
           <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-2">
             🌸 Template Management
           </h1>

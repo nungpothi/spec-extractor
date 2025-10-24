@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { AppDataSource } from './infrastructure/config/database';
 import { createTemplateRoutes } from './interface/routes/templateRoutes';
+import { createTradeupRoutes } from './interface/routes/tradeupRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/template', createTemplateRoutes());
+app.use('/api/tradeup', createTradeupRoutes());
 
 // Health check
 app.get('/health', (req, res) => {
