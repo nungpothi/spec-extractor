@@ -1,6 +1,6 @@
 import React from 'react';
 import { TemplateListItem } from '@/types/template';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Calendar } from 'lucide-react';
 
 interface TemplateTableProps {
   templates: TemplateListItem[];
@@ -26,84 +26,132 @@ export const TemplateTable: React.FC<TemplateTableProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
     if (status === 'active') {
-      return `${baseClasses} bg-green-100 text-green-800`;
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+          Active
+        </span>
+      );
     }
-    return `${baseClasses} bg-red-100 text-red-800`;
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+        Inactive
+      </span>
+    );
+  };
+
+  const getCategoryBadge = (category: string) => {
+    const colors = {
+      General: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      Finance: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
+      Game: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      System: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+    };
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[category as keyof typeof colors] || colors.General}`}>
+        {category}
+      </span>
+    );
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="table-pastel">
+        <div className="flex justify-center items-center py-12">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <div className="w-5 h-5 border-2 border-pastel-accent border-t-transparent rounded-full animate-spin"></div>
+            <span>กำลังโหลดข้อมูล...</span>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border text-sm">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="p-2 text-left">ID</th>
-            <th className="p-2 text-left">Name</th>
-            <th className="p-2 text-left">Category</th>
-            <th className="p-2 text-left">Status</th>
-            <th className="p-2 text-left">Updated</th>
-            <th className="p-2 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {templates.length === 0 ? (
+    <div className="table-pastel animate-slide-up">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-pastel-header dark:bg-gray-700">
             <tr>
-              <td colSpan={6} className="border p-4 text-center text-gray-500">
-                ไม่มีข้อมูล
-              </td>
+              <th className="p-4 text-left font-medium text-gray-700 dark:text-gray-300">ID</th>
+              <th className="p-4 text-left font-medium text-gray-700 dark:text-gray-300">Name</th>
+              <th className="p-4 text-left font-medium text-gray-700 dark:text-gray-300">Category</th>
+              <th className="p-4 text-left font-medium text-gray-700 dark:text-gray-300">Status</th>
+              <th className="p-4 text-left font-medium text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-1">
+                  <Calendar size={14} />
+                  Updated
+                </div>
+              </th>
+              <th className="p-4 text-center font-medium text-gray-700 dark:text-gray-300">Actions</th>
             </tr>
-          ) : (
-            templates.map((template) => (
-              <tr key={template.id} className="hover:bg-gray-50">
-                <td className="border p-2 font-mono text-xs">
-                  {template.id.substring(0, 8)}...
-                </td>
-                <td className="border p-2 font-medium">{template.name}</td>
-                <td className="border p-2">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                    {template.category}
-                  </span>
-                </td>
-                <td className="border p-2">
-                  <span className={getStatusBadge(template.status)}>
-                    {template.status}
-                  </span>
-                </td>
-                <td className="border p-2 text-xs text-gray-600">
-                  {formatDate(template.updated_at)}
-                </td>
-                <td className="border p-2">
-                  <div className="flex justify-center space-x-2">
-                    <button
-                      onClick={() => onEdit(template.id)}
-                      className="text-blue-600 hover:text-blue-800 p-1"
-                      title="แก้ไข"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => onDelete(template.id)}
-                      className="text-red-600 hover:text-red-800 p-1"
-                      title="ลบ"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {templates.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                      📄
+                    </div>
+                    <p className="font-medium">ไม่มีข้อมูล</p>
+                    <p className="text-xs">เริ่มต้นสร้างรายการแรกของคุณ</p>
                   </div>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              templates.map((template, index) => (
+                <tr 
+                  key={template.id} 
+                  className="hover:bg-pastel-header/30 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <td className="px-4 py-3">
+                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      {template.id.substring(0, 8)}...
+                    </code>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
+                      {template.name}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {getCategoryBadge(template.category)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {getStatusBadge(template.status)}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs">
+                    {formatDate(template.updated_at)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center items-center gap-2">
+                      <button
+                        onClick={() => onEdit(template.id)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors duration-200"
+                        title="แก้ไข"
+                      >
+                        <Edit size={12} />
+                        <span className="hidden sm:inline">Edit</span>
+                      </button>
+                      <button
+                        onClick={() => onDelete(template.id)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors duration-200"
+                        title="ลบ"
+                      >
+                        <Trash2 size={12} />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

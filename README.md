@@ -1,6 +1,15 @@
-# Template Management System
+# Template Management System - Enhanced Edition
 
-A complete CRUD system for managing generic items, built with React frontend and Node.js backend using Clean Architecture principles.
+A complete CRUD system for managing generic items, built with React frontend and Node.js backend using Clean Architecture principles. **Now featuring beautiful pastel theme, dark mode, and responsive design!**
+
+## ✨ **New Enhanced Features**
+
+- 🎨 **Beautiful Pastel Theme** - Soft, pleasing color palette
+- 🌙 **Dark Mode Support** - System preference detection with manual toggle
+- 📱 **Fully Responsive** - Mobile-first design that works on all devices
+- ⚡ **Smooth Animations** - Fade-in effects and smooth transitions
+- ♿ **Accessibility Improved** - Better contrast, ARIA labels, keyboard navigation
+- 🎭 **Modern UI/UX** - Card layouts, backdrop blur, enhanced shadows
 
 ## Features
 
@@ -9,8 +18,9 @@ A complete CRUD system for managing generic items, built with React frontend and
 - ✅ Type-safe API with TypeScript
 - ✅ Clean Architecture backend with proper separation of concerns
 - ✅ PostgreSQL database with audit logging
-- ✅ Responsive UI with Tailwind CSS
+- ✅ **NEW:** Responsive UI with pastel theme and dark mode
 - ✅ Form validation with React Hook Form
+- ✅ **NEW:** Enhanced animations and visual feedback
 
 ## Tech Stack
 

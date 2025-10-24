@@ -6,11 +6,6 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,12 +15,9 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #1f2937;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 #root {
@@ -37,20 +29,53 @@ body {
   box-sizing: border-box;
 }
 
+/* Dark mode styles */
+.dark body {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  @apply bg-gray-100 dark:bg-gray-800;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  @apply bg-gray-400 dark:bg-gray-600 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  @apply bg-gray-500 dark:bg-gray-500;
+}
+
+/* Pastel theme custom styles */
+@layer components {
+  .btn-pastel-primary {
+    @apply bg-pastel-accent hover:bg-pastel-accent/90 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .btn-pastel-secondary {
+    @apply bg-pastel-secondary hover:bg-pastel-secondary/90 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .input-pastel {
+    @apply border border-gray-300 dark:border-gray-600 rounded-lg w-full p-3 bg-pastel-input dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pastel-accent focus:border-transparent transition-all duration-200;
+  }
+  
+  .card-pastel {
+    @apply bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg;
+  }
+  
+  .table-pastel {
+    @apply bg-white/80 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md;
+  }
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }

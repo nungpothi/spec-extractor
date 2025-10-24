@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, CheckCircle, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, X, Info, AlertTriangle } from 'lucide-react';
 
 interface AlertProps {
   type: 'success' | 'error' | 'warning' | 'info';
@@ -8,40 +8,49 @@ interface AlertProps {
 }
 
 export const Alert: React.FC<AlertProps> = ({ type, message, onClose }) => {
-  const getAlertClasses = () => {
+  const getAlertConfig = () => {
     switch (type) {
       case 'success':
-        return 'bg-green-50 border-green-200 text-green-800';
+        return {
+          bgClass: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800',
+          textClass: 'text-emerald-800 dark:text-emerald-200',
+          iconClass: 'text-emerald-400 dark:text-emerald-300',
+          icon: CheckCircle,
+        };
       case 'error':
-        return 'bg-red-50 border-red-200 text-red-800';
+        return {
+          bgClass: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+          textClass: 'text-red-800 dark:text-red-200',
+          iconClass: 'text-red-400 dark:text-red-300',
+          icon: AlertCircle,
+        };
       case 'warning':
-        return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+        return {
+          bgClass: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800',
+          textClass: 'text-amber-800 dark:text-amber-200',
+          iconClass: 'text-amber-400 dark:text-amber-300',
+          icon: AlertTriangle,
+        };
       default:
-        return 'bg-blue-50 border-blue-200 text-blue-800';
+        return {
+          bgClass: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
+          textClass: 'text-blue-800 dark:text-blue-200',
+          iconClass: 'text-blue-400 dark:text-blue-300',
+          icon: Info,
+        };
     }
   };
 
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-400" />;
-      case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-400" />;
-      case 'warning':
-        return <AlertCircle className="h-5 w-5 text-yellow-400" />;
-      default:
-        return <AlertCircle className="h-5 w-5 text-blue-400" />;
-    }
-  };
+  const { bgClass, textClass, iconClass, icon: Icon } = getAlertConfig();
 
   return (
-    <div className={`border rounded-md p-4 mb-4 ${getAlertClasses()}`}>
-      <div className="flex">
+    <div className={`border rounded-xl p-4 mb-6 ${bgClass} backdrop-blur-sm shadow-sm animate-slide-up`}>
+      <div className="flex items-start">
         <div className="flex-shrink-0">
-          {getIcon()}
+          <Icon className={`h-5 w-5 ${iconClass}`} />
         </div>
         <div className="ml-3 flex-1">
-          <p className="text-sm font-medium">{message}</p>
+          <p className={`text-sm font-medium ${textClass}`}>{message}</p>
         </div>
         {onClose && (
           <div className="ml-auto pl-3">
@@ -49,9 +58,10 @@ export const Alert: React.FC<AlertProps> = ({ type, message, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex rounded-md p-1.5 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600"
+                className={`inline-flex rounded-md p-1.5 ${textClass} hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200`}
+                aria-label="Close alert"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
