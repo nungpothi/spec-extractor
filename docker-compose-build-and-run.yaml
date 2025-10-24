@@ -81,6 +81,8 @@ services:
       retries: 5
     networks:
       - internal
+    ports:
+      - "30001:5432"
 
 volumes:
   postgres_data:
