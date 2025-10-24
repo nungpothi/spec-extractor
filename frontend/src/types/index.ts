@@ -1,0 +1,73 @@
+// API Types
+export interface ApiResponse<T = unknown> {
+  status: boolean;
+  message: string;
+  results: T;
+}
+
+// Check-in Types
+export interface CheckInRequest {
+  national_id: string;
+}
+
+export interface CheckInResponse {
+  name: string;
+  appointment_date: string;
+  appointment_time: string;
+  queue_no: string;
+}
+
+// Registration Types
+export interface RegisterRequest {
+  name: string;
+  national_id: string;
+  phone: string;
+  appointment_date: string;
+  appointment_time: string;
+}
+
+export interface RegisterResponse {
+  queue_no: string;
+  appointment_date: string;
+  appointment_time: string;
+}
+
+// Available Slots Types
+export interface TimeSlot {
+  date: string;
+  time: string[];
+}
+
+// Print Queue Types
+export interface PrintQueueRequest {
+  queue_no: string;
+}
+
+export interface PrintQueueResponse {
+  queue_no: string;
+  printer_status: string;
+}
+
+// UI State Types
+export interface KioskState {
+  currentStep: 'welcome' | 'checkin' | 'register' | 'appointment' | 'confirmation' | 'print';
+  loading: boolean;
+  error: string | null;
+  checkInData: CheckInResponse | null;
+  registrationData: RegisterResponse | null;
+  availableSlots: TimeSlot[];
+  selectedDate: string;
+  selectedTime: string;
+}
+
+export interface KioskActions {
+  setCurrentStep: (step: KioskState['currentStep']) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  setCheckInData: (data: CheckInResponse | null) => void;
+  setRegistrationData: (data: RegisterResponse | null) => void;
+  setAvailableSlots: (slots: TimeSlot[]) => void;
+  setSelectedDate: (date: string) => void;
+  setSelectedTime: (time: string) => void;
+  reset: () => void;
+}
