@@ -15,7 +15,7 @@ services:
     restart: always
 
     ports:
-      - "80:80"
+      - "5330:80"
 
     environment:
       - DOMAIN=${DOMAIN:-self-service-kiosk.givemebug.online}
@@ -57,11 +57,11 @@ services:
         max-file: "3"
 
     # Resource limits
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-          cpus: '0.5'
-        reservations:
-          memory: 64M
-          cpus: '0.25'
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 128M
+#          cpus: '0.5'
+#        reservations:
+#          memory: 64M
+#          cpus: '0.25'
