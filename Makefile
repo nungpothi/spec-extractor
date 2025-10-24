@@ -40,7 +40,7 @@ push:
 .PHONY: deploy
 deploy:
 	@echo "🚀 Building and deploying Self-Service Kiosk locally..."
-	docker-compose up -d --build --remove-orphans
+	docker compose up -d --build --remove-orphans
 	@echo "✅ Deployment completed"
 	@echo "🌐 Available at: http://localhost"
 
@@ -48,28 +48,28 @@ deploy:
 .PHONY: deploy-registry
 deploy-registry:
 	@echo "🚀 Deploying Self-Service Kiosk from registry..."
-	docker-compose pull
-	docker-compose up -d --remove-orphans
+	docker compose pull
+	docker compose up -d --remove-orphans
 	@echo "✅ Deployment completed"
 	@echo "🌐 Available at: https://self-service-kiosk.givemebug.online"
 
 # View logs
 .PHONY: logs
 logs:
-	docker-compose logs -f $(SERVICE_NAME)
+	docker compose logs -f $(SERVICE_NAME)
 
 # Stop container
 .PHONY: stop
 stop:
 	@echo "⏹️  Stopping container..."
-	docker-compose stop
+	docker compose stop
 	@echo "✅ Container stopped"
 
 # Clean up
 .PHONY: clean
 clean:
 	@echo "🧹 Cleaning up..."
-	docker-compose down --rmi local --volumes
+	docker compose down --rmi local --volumes
 	docker image prune -f
 	@echo "✅ Cleanup completed"
 
@@ -77,7 +77,7 @@ clean:
 .PHONY: status
 status:
 	@echo "📊 Container Status:"
-	docker-compose ps
+	docker compose ps
 	@echo ""
 	@echo "📊 Image Info:"
 	docker images | grep $(REGISTRY) || echo "No images found"
