@@ -33,6 +33,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://spec-extractor-app-api.givemebug.online}
       dockerfile: Dockerfile
     image: ${FRONTEND_IMAGE:-registry.gitlab.com/givemebug/dota2/frontend:latest}
     container_name: spec-extractor-frontend

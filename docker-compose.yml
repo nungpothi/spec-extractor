@@ -45,6 +45,20 @@ services:
     networks:
       - internal
 
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://api.example.com}
+    image: spec-extractor-frontend:local
+    container_name: spec-extractor-frontend
+    restart: always
+    environment:
+      # Set this so host-level nginx-proxy can route by hostname (if used)
+      VIRTUAL_HOST: ${FRONTEND_VIRTUAL_HOST:-frontend.example.com}
+    networks:
+      - default
+
 volumes:
   postgres_data:
 

@@ -7,8 +7,10 @@ import type {
   RequirementItem,
 } from '../types';
 
+const API_BASE = ((import.meta as any)?.env?.VITE_API_URL as string) || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: `${API_BASE}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,31 +28,31 @@ api.interceptors.request.use((config) => {
 export class RequirementService {
   static async createRequirement(data: CreateRequirementRequest): Promise<CreateRequirementResponse> {
     const response = await api.post<ApiResponse<CreateRequirementResponse>>('/requirements', data);
-    
+
     if (response.data.status && response.data.results.length > 0) {
       return response.data.results[0];
     }
-    
+
     throw new Error(response.data.errors.join(', ') || 'Failed to create requirement');
   }
 
   static async updateRequirement(id: string, data: UpdateRequirementRequest): Promise<CreateRequirementResponse> {
     const response = await api.put<ApiResponse<CreateRequirementResponse>>(`/requirements/${id}`, data);
-    
+
     if (response.data.status && response.data.results.length > 0) {
       return response.data.results[0];
     }
-    
+
     throw new Error(response.data.errors.join(', ') || 'Failed to update requirement');
   }
 
   static async getAllRequirements(): Promise<RequirementItem[]> {
     const response = await api.get<ApiResponse<RequirementItem>>('/requirements');
-    
+
     if (response.data.status) {
       return response.data.results;
     }
-    
+
     throw new Error(response.data.errors.join(', ') || 'Failed to fetch requirements');
   }
 }

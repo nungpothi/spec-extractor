@@ -2,6 +2,10 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# allow passing the API URL at build time
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
 # Copy package files
 COPY package*.json ./
 
@@ -11,7 +15,7 @@ RUN npm i
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application (Vite will pick up VITE_API_URL from env)
 RUN npm run build
 
 # Production stage

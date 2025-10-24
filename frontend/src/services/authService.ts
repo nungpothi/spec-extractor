@@ -8,8 +8,11 @@ import type {
   UserProfile,
 } from '../types';
 
+// Read VITE_API_URL from import.meta.env (Vite injects VITE_* env vars at build time)
+const API_BASE = ((import.meta as any)?.env?.VITE_API_URL as string) || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: `${API_BASE}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -39,10 +42,10 @@ export class AuthService {
       throw new Error(response.data.message || 'Login failed');
     }
     const result = response.data.results[0];
-    
+
     // Store token in localStorage
     localStorage.setItem('auth_token', result.token);
-    
+
     return result;
   }
 
