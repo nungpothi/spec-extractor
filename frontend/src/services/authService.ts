@@ -10,7 +10,7 @@ import type {
 
 // Read VITE_API_URL from import.meta.env (Vite injects VITE_* env vars at build time)
 const API_BASE = ((import.meta as any)?.env?.VITE_API_URL as string) || 'http://localhost:8000';
-
+console.log('DEBUG: API_BASE', API_BASE);
 const api = axios.create({
   baseURL: `${API_BASE}/api`,
   headers: {
