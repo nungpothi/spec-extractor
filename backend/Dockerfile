@@ -2,11 +2,11 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files (including lockfile) for deterministic installs
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies for build (includes devDependencies)
+RUN npm i
 
 # Copy source code
 COPY . .
@@ -19,9 +19,9 @@ FROM node:18-alpine AS production
 
 WORKDIR /app
 
-# Install production dependencies
-COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+# Install production dependencies (copy lockfile from builder)
+COPY --from=builder /app/package*.json ./
+RUN npm i --omit=dev && npm cache clean --force
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
