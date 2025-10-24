@@ -13,7 +13,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: ${BACKEND_PORT:-8000}
-      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_HOST: ${BACKEND_LETSENCRYPT_HOST}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       DB_HOST: postgres
@@ -41,7 +41,7 @@ services:
       - .env
     environment:
       NODE_ENV: production
-      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_HOST: ${FRONTEND_LETSENCRYPT_HOST}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       BACKEND_URL: http://backend:8000
