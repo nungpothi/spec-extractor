@@ -6,7 +6,7 @@ import { kioskService } from '../services/kioskService';
 const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState('');
-  const [showRegistrationPrompt, setShowRegistrationPrompt] = useState(false);
+  const [showRegistrationPrompt, setShowRegistrationPrompt] = useState(true);
   const {
     loading,
     error,
@@ -21,7 +21,7 @@ const WelcomePage: React.FC = () => {
   React.useEffect(() => {
     reset();
     setIdentifier('');
-    setShowRegistrationPrompt(false);
+    setShowRegistrationPrompt(true);
   }, [reset]);
 
   const handleCheckIn = async (event: React.FormEvent) => {
