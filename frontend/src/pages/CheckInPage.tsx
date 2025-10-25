@@ -5,7 +5,7 @@ import { kioskService } from '../services/kioskService';
 
 const CheckInPage: React.FC = () => {
   const navigate = useNavigate();
-  const [nationalId, setNationalId] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const { 
     loading, 
     error, 
@@ -17,8 +17,8 @@ const CheckInPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!nationalId.trim()) {
-      setError('Please enter your National ID');
+    if (!identifier.trim()) {
+      setError('Please enter your phone number or ID');
       return;
     }
 
@@ -26,13 +26,13 @@ const CheckInPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await kioskService.checkIn({ national_id: nationalId });
+      const response = await kioskService.checkIn({ identifier: identifier.trim() });
       
       if (response.status) {
         setCheckInData(response.results);
         navigate('/confirmation');
       } else {
-        setError(response.message);
+        setError(response.message || 'No appointment found.');
       }
     } catch (err) {
       setError('Failed to check in. Please try again.');
@@ -61,17 +61,16 @@ const CheckInPage: React.FC = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="nationalId" className="form-label">
-              National ID (13 digits)
+            <label htmlFor="identifier" className="form-label">
+              Phone number or ID
             </label>
             <input
               type="text"
-              id="nationalId"
+              id="identifier"
               className="form-input"
-              value={nationalId}
-              onChange={(e) => setNationalId(e.target.value)}
-              placeholder="Enter your 13-digit National ID"
-              maxLength={13}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Enter your registered detail"
               disabled={loading}
             />
           </div>
@@ -97,7 +96,7 @@ const CheckInPage: React.FC = () => {
         </form>
 
         <div style={{ marginTop: '20px', fontSize: '0.9rem', color: '#666' }}>
-          <p>For demo purposes, try National ID: 1234567890123</p>
+            <p>Demo credential: 0812345678</p>
         </div>
       </div>
     </div>
