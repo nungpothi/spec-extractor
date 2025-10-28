@@ -12,7 +12,7 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20,nullable: true})
   phone!: string;
 
   @Column({ type: 'varchar', length: 120, unique: true })
