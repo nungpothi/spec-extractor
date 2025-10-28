@@ -71,6 +71,11 @@ export const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
                 Webhook
               </Link>
             </li>
+            <li>
+              <Link to="/quotations" className="hover:text-slate-900 transition-colors">
+                Quotation
+              </Link>
+            </li>
             {isAdmin && (
               <>
                 <li

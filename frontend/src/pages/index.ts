@@ -7,3 +7,4 @@ export * from './WelcomePage';
 export * from './UserPage';
 export * from './RequirementPage';
 export * from './WebhookPage';
+export * from './QuotationPage';

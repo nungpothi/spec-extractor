@@ -3,3 +3,5 @@ export * from './User';
 export * from './Requirement';
 export * from './Webhook';
 export * from './WebhookLog';
+export * from './Quotation';
+export * from './QuotationItem';

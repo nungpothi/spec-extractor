@@ -113,3 +113,51 @@ export interface WebhookItem {
   response_template?: object | null;
   created_at: string;
 }
+
+// Quotation Types
+export interface QuotationItemPayload {
+  id?: string;
+  name: string;
+  qty: number;
+  price: number;
+  total?: number;
+}
+
+export interface QuotationSummary {
+  id: string;
+  companyName: string;
+  clientName: string;
+  total: number;
+  includeVat: boolean;
+  createdAt?: string;
+}
+
+export interface QuotationDetail extends QuotationSummary {
+  note?: string;
+  items: QuotationItemPayload[];
+}
+
+export interface CreateQuotationRequest {
+  companyName: string;
+  clientName: string;
+  items: QuotationItemPayload[];
+  includeVat: boolean;
+  note?: string;
+}
+
+export interface UpdateQuotationRequest {
+  companyName: string;
+  clientName: string;
+  items: QuotationItemPayload[];
+  includeVat: boolean;
+  note?: string;
+}
+
+export interface CreateQuotationResponse {
+  id: string;
+  total: number;
+}
+
+export interface QuotationShareResponse {
+  publicUrl: string;
+}

@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { HomePage, PromptSummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage, WebhookPage } from './pages';
+import { HomePage, PromptSummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage, WebhookPage, QuotationPage } from './pages';
 import { ProtectedRoute } from './components';
 
 export const router = createBrowserRouter([
@@ -60,6 +60,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <WebhookPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/quotations',
+    element: (
+      <ProtectedRoute>
+        <QuotationPage />
       </ProtectedRoute>
     ),
   },
