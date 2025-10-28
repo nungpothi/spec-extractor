@@ -20,7 +20,9 @@ import {
   DeleteSpecificationUseCase,
   JsonToHtmlConverterService,
   PreviewJsonUseCase,
+  RenderPdfUseCase,
 } from './usecases';
+import { PdfService } from './services/pdf.service';
 
 // Import interface layer
 import {
@@ -30,6 +32,8 @@ import {
   requestLogger,
   createSpecificationRoutes,
   createPreviewRoutes,
+  PdfController,
+  createPdfRoutes,
 } from './interface';
 import { authRoutes, requirementRoutes, webhookRoutes, quotationRoutes } from './interface/routes';
 
@@ -69,6 +73,7 @@ class Application {
     // Dependency injection
     const specificationRepository = new SpecificationRepository();
     const jsonToHtmlConverter = new JsonToHtmlConverterService();
+    const pdfService = new PdfService();
 
     // Initialize use cases
     const getAllSpecificationsUseCase = new GetAllSpecificationsUseCase(specificationRepository);
@@ -79,6 +84,7 @@ class Application {
     );
     const deleteSpecificationUseCase = new DeleteSpecificationUseCase(specificationRepository);
     const previewJsonUseCase = new PreviewJsonUseCase(jsonToHtmlConverter);
+    const renderPdfUseCase = new RenderPdfUseCase(pdfService);
 
     // Initialize controllers
     const specificationController = new SpecificationController(
@@ -88,10 +94,12 @@ class Application {
       deleteSpecificationUseCase
     );
     const previewController = new PreviewController(previewJsonUseCase);
+    const pdfController = new PdfController(renderPdfUseCase);
 
     // Setup routes
     this.app.use('/api', createSpecificationRoutes(specificationController));
     this.app.use('/api', createPreviewRoutes(previewController));
+    this.app.use('/api', createPdfRoutes(pdfController));
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/requirements', requirementRoutes);
     this.app.use('/api/webhook', webhookRoutes);

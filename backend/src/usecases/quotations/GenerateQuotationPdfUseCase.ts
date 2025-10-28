@@ -1,4 +1,7 @@
+import path from 'path';
+import { promises as fs } from 'fs';
 import { IQuotationRepository } from '../../domain/repositories';
+import { PdfService } from '../../services/pdf.service';
 
 export interface GenerateQuotationPdfInput {
   quotationId: string;
@@ -8,6 +11,7 @@ export interface GenerateQuotationPdfInput {
 export interface GenerateQuotationPdfResult {
   fileName: string;
   buffer: Buffer;
+  fileUrl: string;
 }
 
 const formatCurrency = (value: number): string => {
@@ -18,61 +22,59 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
-const escapePdfText = (text: string): string => {
-  return text.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+const formatDate = (date: Date): string => {
+  return new Intl.DateTimeFormat('th-TH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
 };
 
-const buildPdfBuffer = (lines: string[]): Buffer => {
-  const contentLines: string[] = ['BT'];
-  let isFirst = true;
+const buildTemplatePayload = (quotation: {
+  id: string;
+  companyName: string;
+  clientName: string;
+  note?: string | null;
+  subtotal: number;
+  vatAmount: number;
+  total: number;
+  vatRate: number;
+  createdAt: Date;
+  items: Array<{
+    nameTh: string;
+    qty: number;
+    unitPrice: number;
+    total: number;
+  }>;
+}) => {
+  const quotationNumber = `Q-${quotation.id.slice(0, 8).toUpperCase()}`;
 
-  lines.forEach((line) => {
-    if (isFirst) {
-      contentLines.push('/F1 18 Tf');
-      contentLines.push('50 800 Td');
-      contentLines.push(`(${escapePdfText(line)}) Tj`);
-      contentLines.push('0 -26 Td');
-      contentLines.push('/F1 12 Tf');
-      isFirst = false;
-    } else {
-      contentLines.push(`(${escapePdfText(line)}) Tj`);
-      contentLines.push('0 -18 Td');
-    }
-  });
-
-  contentLines.push('ET');
-
-  const contentStream = contentLines.join('\n');
-  const contentLength = Buffer.byteLength(contentStream, 'utf8');
-
-  const objects = [
-    '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
-    '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
-    '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >> endobj\n',
-    `4 0 obj << /Length ${contentLength} >> stream\n${contentStream}\nendstream\nendobj\n`,
-    '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n',
-  ];
-
-  const header = '%PDF-1.4\n';
-  let offset = Buffer.byteLength(header, 'utf8');
-  const xrefEntries: string[] = ['0000000000 65535 f \n'];
-
-  objects.forEach((object) => {
-    xrefEntries.push(`${offset.toString().padStart(10, '0')} 00000 n \n`);
-    offset += Buffer.byteLength(object, 'utf8');
-  });
-
-  const body = header + objects.join('');
-  const startXref = Buffer.byteLength(body, 'utf8');
-  const xref = `xref\n0 ${objects.length + 1}\n${xrefEntries.join('')}`;
-  const trailer = `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${startXref}\n%%EOF`;
-
-  const pdfString = `${body}${xref}${trailer}`;
-  return Buffer.from(pdfString, 'utf8');
+  return {
+    title: 'ใบเสนอราคา / Quotation',
+    quotationNumber,
+    quotationDate: formatDate(quotation.createdAt),
+    customer: {
+      name: quotation.clientName,
+      address: '-',
+    },
+    items: quotation.items.map((item, index) => ({
+      index: index + 1,
+      name: item.nameTh,
+      qty: item.qty,
+      price: formatCurrency(item.unitPrice),
+      total: formatCurrency(item.total),
+    })),
+    grandTotal: formatCurrency(quotation.total),
+    note: quotation.note,
+    footerRemark: `รวมภาษีมูลค่าเพิ่ม ${(quotation.vatRate * 100).toFixed(2)}% | สร้างเมื่อ ${formatDate(new Date())}`,
+  };
 };
 
 export class GenerateQuotationPdfUseCase {
-  constructor(private quotationRepository: IQuotationRepository) {}
+  constructor(
+    private quotationRepository: IQuotationRepository,
+    private pdfService: PdfService,
+  ) {}
 
   async execute({ quotationId, userId }: GenerateQuotationPdfInput): Promise<GenerateQuotationPdfResult> {
     const quotation = await this.quotationRepository.findById(quotationId, { userId });
@@ -85,30 +87,15 @@ export class GenerateQuotationPdfUseCase {
       throw new Error('Access denied');
     }
 
-    const lines: string[] = [
-      'Quotation / ใบเสนอราคา',
-      `Company / บริษัท: ${quotation.companyName}`,
-      `Client / ลูกค้า: ${quotation.clientName}`,
-    ];
-
-    if (quotation.note) {
-      lines.push(`Note / หมายเหตุ: ${quotation.note}`);
-    }
-
-    lines.push('Items / รายการสินค้า');
-    quotation.items.forEach((item, index) => {
-      lines.push(
-        `${index + 1}. ${item.nameTh} | Qty: ${item.qty} | Unit: ${formatCurrency(item.unitPrice)} | Total: ${formatCurrency(item.total)}`
-      );
+    const templateData = buildTemplatePayload(quotation);
+    const { filePath, fileUrl } = await this.pdfService.generate({
+      template: 'quotation',
+      data: templateData,
     });
 
-    lines.push(`Subtotal / ยอดรวม: ${formatCurrency(quotation.subtotal)}`);
-    lines.push(`VAT (${(quotation.vatRate * 100).toFixed(2)}%): ${formatCurrency(quotation.vatAmount)}`);
-    lines.push(`Total / รวมสุทธิ: ${formatCurrency(quotation.total)}`);
+    const buffer = await fs.readFile(filePath);
+    const fileName = path.basename(filePath);
 
-    const buffer = buildPdfBuffer(lines);
-    const fileName = `quotation-${quotation.id}.pdf`;
-
-    return { buffer, fileName };
+    return { buffer, fileName, fileUrl };
   }
 }

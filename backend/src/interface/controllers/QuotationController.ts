@@ -12,6 +12,7 @@ import {
   UpdateQuotationRequestDto,
 } from '../../usecases/dto';
 import { QuotationRepository } from '../../infrastructure/repositories';
+import { PdfService } from '../../services/pdf.service';
 
 export class QuotationController {
   private createQuotationUseCase: CreateQuotationUseCase;
@@ -23,12 +24,14 @@ export class QuotationController {
 
   constructor() {
     const quotationRepository = new QuotationRepository();
+    const pdfService = new PdfService();
+
     this.createQuotationUseCase = new CreateQuotationUseCase(quotationRepository);
     this.getQuotationListUseCase = new GetQuotationListUseCase(quotationRepository);
     this.getQuotationDetailUseCase = new GetQuotationDetailUseCase(quotationRepository);
     this.updateQuotationUseCase = new UpdateQuotationUseCase(quotationRepository);
     this.generateQuotationShareLinkUseCase = new GenerateQuotationShareLinkUseCase(quotationRepository);
-    this.generateQuotationPdfUseCase = new GenerateQuotationPdfUseCase(quotationRepository);
+    this.generateQuotationPdfUseCase = new GenerateQuotationPdfUseCase(quotationRepository, pdfService);
   }
 
   createQuotation = async (req: Request, res: Response): Promise<void> => {

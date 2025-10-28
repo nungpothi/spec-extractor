@@ -5,3 +5,4 @@ export * from './RequirementController';
 export * from './PreviewController';
 export * from './WebhookController';
 export * from './QuotationController';
+export * from './PdfController';

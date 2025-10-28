@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{title}}</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&family=Noto+Sans:wght@400;600&display=swap');
+
+      body {
+        font-family: 'Noto Sans Thai', 'Noto Sans', sans-serif;
+        margin: 0;
+        padding: 20mm;
+        background: #f5f7fb;
+        color: #1f2937;
+      }
+
+      header {
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-size: 26px;
+        margin: 0 0 8px 0;
+        color: #1e3a8a;
+      }
+
+      .meta {
+        font-size: 14px;
+        color: #4b5563;
+        line-height: 1.6;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 24px;
+        background: #ffffff;
+        border: 1px solid #c7d2fe;
+      }
+
+      thead tr {
+        background: #e0e7ff;
+        color: #1e3a8a;
+      }
+
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #d1d5db;
+        text-align: left;
+        font-size: 13px;
+      }
+
+      th {
+        font-weight: 600;
+      }
+
+      tbody tr:nth-child(odd) {
+        background: #f8fafc;
+      }
+
+      tbody tr:nth-child(even) {
+        background: #eef2ff;
+      }
+
+      tfoot td {
+        font-weight: 600;
+        font-size: 14px;
+        border-top: 2px solid #c7d2fe;
+        text-align: right;
+        background: #f1f5f9;
+      }
+
+      .totals {
+        margin-top: 18px;
+        text-align: right;
+        font-size: 14px;
+        color: #1e3a8a;
+      }
+
+      footer {
+        margin-top: 32px;
+        font-size: 12px;
+        color: #94a3b8;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>{{title}}</h1>
+      <div class="meta">
+        <div>เลขที่ใบเสนอราคา: {{quotationNumber}}</div>
+        <div>วันที่ออกใบเสนอราคา: {{quotationDate}}</div>
+        <div>ลูกค้า: {{customer.name}}</div>
+        <div>ที่อยู่: {{customer.address}}</div>
+      </div>
+    </header>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>รายการสินค้า</th>
+          <th style="text-align: right;">จำนวน</th>
+          <th style="text-align: right;">ราคา/หน่วย</th>
+          <th style="text-align: right;">รวม</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#items}}
+        <tr>
+          <td>{{index}}</td>
+          <td>{{name}}</td>
+          <td style="text-align: right;">{{qty}}</td>
+          <td style="text-align: right;">{{price}}</td>
+          <td style="text-align: right;">{{total}}</td>
+        </tr>
+        {{/items}}
+        {{^items}}
+        <tr>
+          <td colspan="5" style="text-align: center; color: #64748b; padding: 16px;">ไม่มีรายการสินค้า</td>
+        </tr>
+        {{/items}}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">รวมทั้งสิ้น</td>
+          <td>{{grandTotal}}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    {{#note}}
+    <div class="totals">หมายเหตุ: {{note}}</div>
+    {{/note}}
+
+    <footer>
+      เอกสารนี้สร้างขึ้นโดยระบบใบเสนอราคาอัตโนมัติ • {{footerRemark}}
+    </footer>
+  </body>
+</html>
