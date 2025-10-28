@@ -96,6 +96,16 @@ export class PdfService {
 
       const page = await browser.newPage();
       await page.setContent(renderedHtml, { waitUntil: 'networkidle0' });
+      await page.addStyleTag({
+        content: [
+          '@page { margin: 0 !important; }',
+          'html, body {',
+          '  margin: 0 !important;',
+          '  padding: 1rem !important;',
+          '  background: #ffffff !important;',
+          '}'
+        ].join('\n'),
+      });
       await page.emulateMediaType('screen');
 
       await page.pdf({
@@ -103,10 +113,10 @@ export class PdfService {
         format: 'A4',
         printBackground: true,
         margin: {
-          top: '20mm',
-          right: '20mm',
-          bottom: '20mm',
-          left: '20mm',
+          top: '3mm',
+          right: '3mm',
+          bottom: '3mm',
+          left: '3mm',
         },
       });
 
