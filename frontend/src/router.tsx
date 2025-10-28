@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { HomePage, SummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage, WebhookPage } from './pages';
+import { HomePage, PromptSummaryPage, SpecDetailPage, LoginPage, RegisterPage, WelcomePage, UserPage, RequirementPage, WebhookPage } from './pages';
 import { ProtectedRoute } from './components';
 
 export const router = createBrowserRouter([
@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
     path: '/summary',
     element: (
       <ProtectedRoute requiredRole="ADMIN">
-        <SummaryPage />
+        <PromptSummaryPage />
       </ProtectedRoute>
     ),
   },

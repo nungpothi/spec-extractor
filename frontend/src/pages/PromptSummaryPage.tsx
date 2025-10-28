@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSpecStore, useAuthStore } from '../stores';
 import { useCopyToClipboard } from '../hooks';
-import { Button, LoadingSpinner, ErrorMessage, Navbar } from '../components';
+import { LoadingSpinner, ErrorMessage, Navbar } from '../components';
 
-export const SummaryPage: React.FC = () => {
+export const PromptSummaryPage: React.FC = () => {
   const navigate = useNavigate();
   const {
     specs,
@@ -67,15 +67,16 @@ export const SummaryPage: React.FC = () => {
       )}
 
       <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-700">
-            Total: {specs.length} specifications
-          </h2>
-          <button 
-            onClick={() => navigate('/')}
-            className="bg-emerald-300 hover:bg-emerald-400 text-slate-700 px-4 py-2 rounded shadow transition-colors"
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-700">Prompt Summary</h1>
+            <p className="text-sm text-slate-500">Total: {specs.length} specifications</p>
+          </div>
+          <button
+            onClick={() => navigate('/preview')}
+            className="bg-emerald-300 hover:bg-emerald-400 text-slate-700 px-6 py-2 rounded shadow transition-colors"
           >
-            เพิ่มใหม่
+            Create New
           </button>
         </div>
 
@@ -85,7 +86,7 @@ export const SummaryPage: React.FC = () => {
               <tr>
                 <th className="border border-slate-200 p-3 text-left text-slate-600">#</th>
                 <th className="border border-slate-200 p-3 text-left text-slate-600">ID</th>
-                <th className="border border-slate-200 p-3 text-left text-slate-600">Summary</th>
+                <th className="border border-slate-200 p-3 text-left text-slate-600">Prompt Summary</th>
                 <th className="border border-slate-200 p-3 text-left text-slate-600">Created At</th>
                 <th className="border border-slate-200 p-3 text-left text-slate-600">Actions</th>
               </tr>
@@ -96,11 +97,11 @@ export const SummaryPage: React.FC = () => {
                   <td colSpan={5} className="border border-slate-200 p-8 text-center text-slate-500">
                     <div className="flex flex-col items-center space-y-3">
                       <p>No specifications found</p>
-                      <button 
-                        onClick={() => navigate('/')}
+                      <button
+                        onClick={() => navigate('/preview')}
                         className="bg-sky-300 hover:bg-sky-400 text-slate-700 px-4 py-2 rounded shadow transition-colors"
                       >
-                        Create your first specification
+                        Create your first prompt summary
                       </button>
                     </div>
                   </td>

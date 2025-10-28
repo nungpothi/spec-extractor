@@ -1,5 +1,5 @@
 export * from './HomePage';
-export * from './SummaryPage';
+export * from './PromptSummaryPage';
 export * from './SpecDetailPage';
 export * from './LoginPage';
 export * from './RegisterPage';
