@@ -176,7 +176,7 @@ export const WebhookPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-blue-50 to-green-50 p-6 space-y-6">
-      <Navbar className="mb-8" />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto space-y-6">
         <section id="webhook-generator" className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-md border border-slate-100">

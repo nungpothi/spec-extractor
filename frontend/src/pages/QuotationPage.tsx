@@ -246,7 +246,7 @@ export const QuotationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-emerald-50">
-      <Navbar className="px-6 py-4" />
+      <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 pb-12 space-y-6">
         <div className="flex items-center justify-between">
